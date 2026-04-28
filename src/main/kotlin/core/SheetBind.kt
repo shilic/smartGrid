@@ -1,9 +1,9 @@
-package person.shilicheng.core
+package core
 
 /**
  * 在类上标记该类对应哪一个表格。
  */
-@Target(AnnotationTarget.TYPE)
+@Target(AnnotationTarget.TYPE, AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.RUNTIME)
 annotation class SheetBind (
     /** 绑定的表格名称 */

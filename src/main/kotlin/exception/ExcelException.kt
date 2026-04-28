@@ -1,4 +1,4 @@
-package person.shilicheng.exception
+package exception
 
 class ExcelException(
     override val message : String,

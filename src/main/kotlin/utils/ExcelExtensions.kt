@@ -1,7 +1,7 @@
-package person.shilicheng.utils
+package utils
 
 import org.apache.poi.ss.usermodel.*
-import person.shilicheng.exception.ExcelException
+import exception.ExcelException
 import java.io.FileInputStream
 import java.io.FileNotFoundException
 import java.io.IOException
@@ -11,26 +11,24 @@ import java.io.IOException
  * Kotlin 风格的工具类，使用扩展函数和顶层函数;
  */
 private const val LOG_TAG = "ExcelTools"
+val SUPPORTED_EXCEL_EXTENSIONS = listOf("xls", "xlsx")
 
 /**
  * 获取一个工作簿;
  * 使用 Kotlin 的异常处理和资源管理;
  */
 fun createWorkbook (filePath: String): Workbook {
-    return when (val fileExtension = filePath.fileExtension.lowercase()) {
-        "xls", "xlsx" -> {
-            try {
-                // 使用 Kotlin 的 use 函数自动管理资源
-                FileInputStream(filePath).use { fileStream -> WorkbookFactory.create(fileStream) }
-            } catch (ex: FileNotFoundException) {
-                throw ExcelException("$LOG_TAG: FileNotFoundException - 文件不存在: ${ex.message}")
-            } catch (ex: IOException) {
-                throw ExcelException("$LOG_TAG: IOException - 发生 IO 错误: ${ex.message}")
-            } catch (ex: Exception) {
-                throw ExcelException("$LOG_TAG: 未知错误: ${ex.message}")
-            }
-        }
-        else -> throw ExcelException("$LOG_TAG: 不支持的文件格式: $fileExtension, 必须是\"xls\", \"xlsx\"文件")
+    val fileExtension = filePath.fileExtension.lowercase()
+    require(SUPPORTED_EXCEL_EXTENSIONS.contains(fileExtension)){"$LOG_TAG: 不支持的文件格式: $fileExtension, 必须是\"xls\", \"xlsx\"文件"}
+    return try {
+        // 使用 Kotlin 的 use 函数自动管理资源
+        FileInputStream(filePath).use { fileStream -> WorkbookFactory.create(fileStream) }
+    } catch (ex: FileNotFoundException) {
+        throw ExcelException("$LOG_TAG: FileNotFoundException - 文件不存在: ${ex.message}")
+    } catch (ex: IOException) {
+        throw ExcelException("$LOG_TAG: IOException - 发生 IO 错误: ${ex.message}")
+    } catch (ex: Exception) {
+        throw ExcelException("$LOG_TAG: 未知错误: ${ex.message}")
     }
 }
 

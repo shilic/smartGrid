@@ -1,10 +1,10 @@
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import person.shilicheng.utils.ExcelConverter.toBase26
-import person.shilicheng.utils.ExcelConverter.toDecimalNumber
-import person.shilicheng.utils.base26
-import person.shilicheng.utils.exCell
+import utils.ExcelConverter.toBase26
+import utils.ExcelConverter.toDecimalNumber
+import utils.base26
+import utils.exCell
 
 /**
  * 单元测试示例
