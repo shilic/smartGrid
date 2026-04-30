@@ -1,4 +1,4 @@
-package utils
+package demo.utils
 
 import com.google.gson.*
 import com.google.gson.reflect.TypeToken
@@ -621,7 +621,7 @@ private class SetHexAdapter<T : Number>(private val elementClass: Class<T>) : Ty
         return set
     }
 }
-
+/** 仅在测试时使用，如果你不喜欢，可以使用其他序列化框架 */
 inline fun <reified T> T.toGsonString(): String = GsonAdapter.gson.toJson(this)
 
 inline fun <reified T> String.fromGsonString(): T = GsonAdapter.gson.fromJson(this, T::class.java)

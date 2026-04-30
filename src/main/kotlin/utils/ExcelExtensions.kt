@@ -56,11 +56,12 @@ fun Sheet.getLastRowIndex(): Int  = when {
 fun Row.isRowNonEmpty(): Boolean = iterator().asSequence().any { cell -> cell.isNotBlank() }
 
 /**
- * 检查单元格是否包含有效内容(非空和非空白)
- * 使用 Kotlin 的 when 表达式，清晰表达多条件判断
+ * 单元格不为空，并且有值
  */
-fun Cell.isNotBlank(): Boolean = when {
-    cellType == CellType.BLANK -> false
+fun Cell?.isNotBlank(): Boolean = when {
+    // 这一段就是为了解决 java 和 kotlin 互操作的坑，而新加的一行代码。必须强行判断单元格非空。
+    this == null -> false
+    cellType.equals(CellType.BLANK) -> false
     else -> toString().isNotBlank()
 }
 
@@ -131,9 +132,7 @@ fun Cell.parseFraction(): Double {
     val denominatorStr = matchResult.groupValues[2]
     val numerator = numeratorStr.toDoubleOrNull() ?: throw ExcelException("无法解析分子: $numeratorStr，错误单元格值: ${excelIndex()}, 单元格坐标: $exCell ")
     val denominator = denominatorStr.toDoubleOrNull() ?: throw ExcelException("无法解析分母: $denominatorStr，错误单元格值: ${excelIndex()}, 单元格坐标: $exCell ")
-    if (denominator == 0.0) {
-        throw ExcelException("分母不能为零，错误单元格值: ${excelIndex()}, 单元格坐标: $exCell ")
-    }
+    if (denominator == 0.0) { throw ExcelException("分母不能为零，错误单元格值: ${excelIndex()}, 单元格坐标: $exCell ") }
     return numerator / denominator
 }
 /**

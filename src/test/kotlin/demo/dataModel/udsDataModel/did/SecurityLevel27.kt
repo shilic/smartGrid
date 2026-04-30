@@ -1,6 +1,6 @@
-package demo.dataModel.did
+package demo.dataModel.udsDataModel.did
 
-import core.GridBind
+import core.GridColumnBind
 
 /**
  * 27安全等级 - 使用枚举类
@@ -9,16 +9,16 @@ enum class SecurityLevel27(
     val level: Int,
     val requiresAuthentication: Boolean
 ) {
-    @GridBind(headerText = "Level1", pattern = "Level1|level1|LEVEL1|1")
+    @GridColumnBind(headerText = "Level1", pattern = "Level1|level1|LEVEL1|1")
     LEVEL1(level = 1, requiresAuthentication = false),
 
-    @GridBind(headerText = "Level2", pattern = "Level2|level2|LEVEL2|2")
+    @GridColumnBind(headerText = "Level2", pattern = "Level2|level2|LEVEL2|2")
     LEVEL2(level = 2, requiresAuthentication = true),
 
-    @GridBind(headerText = "Level3", pattern = "Level3|level3|LEVEL3|3")
+    @GridColumnBind(headerText = "Level3", pattern = "Level3|level3|LEVEL3|3")
     LEVEL3(level = 3, requiresAuthentication = true),
 
-    @GridBind(headerText = "Level4", pattern = "Level4|level4|LEVEL4|4")
+    @GridColumnBind(headerText = "Level4", pattern = "Level4|level4|LEVEL4|4")
     LEVEL4(level = 4, requiresAuthentication = true);
 
     companion object {

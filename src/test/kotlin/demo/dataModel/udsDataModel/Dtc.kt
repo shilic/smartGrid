@@ -1,4 +1,4 @@
-package demo.dataModel
+package demo.dataModel.udsDataModel
 
 import core.*
 
@@ -6,8 +6,8 @@ import core.*
  * 诊断故障码 (DTC) 数据类
  * 使用密封接口实现更类型安全的多态行为
  */
-@SheetBind(sheetName = "DTC List", pattern = "\\s*(DTC|dtc|Dtc)\\s*(List|list|LIST)\\s*", sheetDataType = SheetDataType.Dictionary)
-class Dtc  : IGridData {
+@GridSheetBind(sheetName = "DTC List", pattern = "\\s*(DTC|dtc|Dtc)\\s*(List|list|LIST)\\s*", gridSheetType = GridSheetType.Dictionary)
+class Dtc  : IGridRowData {
     // ======================= 1. 接口变量 =======================
     override val gridKey: String get() = dtcHexNumber.toHexString()
     override var gridFather: String = ""
@@ -15,63 +15,63 @@ class Dtc  : IGridData {
 
     // ====================== 2. 故障核心信息 ====================
     /** 主键：DTC 的 16 进制值 */
-    @GridBind(headerText = "DtcHexNumber", pattern = "DTC值|DtcHexNumber|((DTC|dtc|Dtc)\\s*(Byte|byte|BYTE))", valueType = GridValueType.HexNumber, keyword = true)
+    @GridColumnBind(headerText = "DtcHexNumber", pattern = "DTC值|DtcHexNumber|((DTC|dtc|Dtc)\\s*(Byte|byte|BYTE))", valueType = GridValueType.HexNumber, keyword = true)
     var dtcHexNumber: UInt = 0u
     /** DTC 英文名称 */
-    @GridBind(headerText = "DTC英文名称", pattern = "DTC英文名称", valueType = GridValueType.Text)
+    @GridColumnBind(headerText = "DTC英文名称", pattern = "DTC英文名称", valueType = GridValueType.Text)
     var dtcName: String = ""
     /** DTC 含义描述 */
-    @GridBind(headerText = "DTC含义", pattern = "DTC含义", valueType = GridValueType.Text)
+    @GridColumnBind(headerText = "DTC含义", pattern = "DTC含义", valueType = GridValueType.Text)
     var dtcMeaning: String = ""
 
     // ===================== 3. 额外故障信息 =====================
     // 故障检测前置条件
-    @GridBind(headerText = "故障检测前置条件", pattern = "故障检测前置条件", valueType = GridValueType.Text)
+    @GridColumnBind(headerText = "故障检测前置条件", pattern = "故障检测前置条件", valueType = GridValueType.Text)
     var preconditions: String = ""
     // 故障触发条件
-    @GridBind(headerText = "故障触发条件", pattern = "故障触发条件", valueType = GridValueType.Text)
+    @GridColumnBind(headerText = "故障触发条件", pattern = "故障触发条件", valueType = GridValueType.Text)
     var triggerConditions: String = ""
     // 故障恢复条件
-    @GridBind(headerText = "故障恢复条件", pattern = "故障恢复条件", valueType = GridValueType.Text)
+    @GridColumnBind(headerText = "故障恢复条件", pattern = "故障恢复条件", valueType = GridValueType.Text)
     var recoveryConditions: String = ""
     // 故障严重等级
-    @GridBind(headerText = "故障严重等级", pattern = "故障严重等级", valueType = GridValueType.Text)
+    @GridColumnBind(headerText = "故障严重等级", pattern = "故障严重等级", valueType = GridValueType.Text)
     var faultLevel: String = ""
     // 系统表现
-    @GridBind(headerText = "系统表现", pattern = "系统表现", valueType = GridValueType.Text)
+    @GridColumnBind(headerText = "系统表现", pattern = "系统表现", valueType = GridValueType.Text)
     var systemAction: String = ""
     // 可能故障原因
-    @GridBind(headerText = "可能故障原因", pattern = "可能故障原因", valueType = GridValueType.Text)
+    @GridColumnBind(headerText = "可能故障原因", pattern = "可能故障原因", valueType = GridValueType.Text)
     var possibleFaultCauses: String = ""
     // 维修建议
-    @GridBind(headerText = "维修建议", pattern = "维修建议", valueType = GridValueType.Text)
+    @GridColumnBind(headerText = "维修建议", pattern = "维修建议", valueType = GridValueType.Text)
     var correctiveAction: String = ""
     // 特殊指示
-    @GridBind(headerText = "特殊指示", pattern = "特殊指示", valueType = GridValueType.Text)
+    @GridColumnBind(headerText = "特殊指示", pattern = "特殊指示", valueType = GridValueType.Text)
     var specialIndication: String = ""
     // 备注
-    @GridBind(headerText = "备注", pattern = "备注", valueType = GridValueType.Text)
+    @GridColumnBind(headerText = "备注", pattern = "备注", valueType = GridValueType.Text)
     var remarks: String = ""
 
     // ==================== 故障码状态 =================
     /** 故障状态掩码，用于记录故障状态。
      * 在接收故障码时，如果本地已有DTC则赋值，否则新建DTC 。*/
     @Transient
-    @GridBind(headerText = "故障掩码", valueType = GridValueType.HexNumber)
+    @GridColumnBind(headerText = "故障掩码", valueType = GridValueType.HexNumber)
     var dtcStatusMaskValue: Byte = 0
 
     // --------------------- 计算属性 ---------------------
     /**  DTC 显示码（如 C056789），从 16 进制值解析而来;
      * 计算属性，每次访问时动态计算 */
     @delegate:Transient
-    @GridBind(headerText = "DTC显示码", valueType = GridValueType.Text, uiIgnore = true)
+    @GridColumnBind(headerText = "DTC显示码", valueType = GridValueType.Text, uiIgnore = true)
     val dtcDisplay: String by lazy { parseDtcHexToDisplay(dtcHexNumber) }
     /**
      * DTC 故障系统区域/故障属性;
      * 从 16 进制值的高两位解析
      */
     @delegate:Transient
-    @GridBind(headerText = "故障属性", valueType = GridValueType.Enum)
+    @GridColumnBind(headerText = "故障属性", valueType = GridValueType.Enum)
     val dtcSystemType: DtcSystemType by lazy { parseDtcHexToSystemType(dtcHexNumber) }
 
     // --------------------- 公共方法 -----------------------

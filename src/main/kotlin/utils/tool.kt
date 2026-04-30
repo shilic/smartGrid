@@ -1,7 +1,7 @@
 package utils
 
-import core.GridBind
-import core.GridInfo
+import core.GridColumnBind
+import core.GridColumnInfo
 import core.GridValueType
 import core.bindTo
 import kotlin.reflect.KClass
@@ -16,14 +16,14 @@ fun <K : Any, V : Any> createTypedMap(keyType: KClass<K>, valueType: KClass<V>):
     return LinkedHashMap<K, V>()
 }
 /**
- * 使用反射, 从类型上的所有属性获取绑定的 GridInfo 信息
+ * 使用反射, 从类型上的所有属性获取绑定的 GridInfo 信息。你可能需要缓存反射的结果。
  *
  * @param filter 是否使用默认过滤条件（pattern 非空 或 valueType = OtherPage）; 当你要获取所有注解时，使 defaultFilter 为 false ;
  */
-fun KClass<*>.getGridInfos(filter: Boolean = true): List<GridInfo> =
+fun KClass<*>.getGridInfos(filter: Boolean = true): List<GridColumnInfo> =
     getOrderProperties()
         // 步骤1: 创建GridBind注解(筛选注解不为空)和属性的键值对集合
-        .mapNotNull { property -> property.findAnnotation<GridBind>()?.let { property to it } }
+        .mapNotNull { property -> property.findAnnotation<GridColumnBind>()?.let { property to it } }
         // 步骤2: 使用kotlin的函数筛选注解的 pattern 和 valueType 。(filter 为 false 时，立刻放弃筛选。)
         .filter { (_, bind) -> !filter || bind.pattern.isNotBlank() || bind.valueType == GridValueType.OtherPage }
         // 步骤3: 筛选可变属性
@@ -31,18 +31,17 @@ fun KClass<*>.getGridInfos(filter: Boolean = true): List<GridInfo> =
             val isMutable = property is KMutableProperty1<*, *>
             // 当默认过滤开启, 且属性不可变时，抛异常
             if (!isMutable && filter) {
-                throw IllegalArgumentException("""
-                    类型"${this.simpleName}"上的属性"${property.name}"必须为可变属性，
-                    因为标注了${GridBind::class.simpleName}注解且需要反射赋值。
-                    请将属性声明修改为 `var ${property.name}`。
-                """.trimIndent())
+                throw IllegalArgumentException("类型\"${this.simpleName}\"上的属性\"${property.name}\"必须为可变属性; " +
+                        "因为标注了\"${GridColumnBind::class.simpleName}\"注解的属性需要通过反射赋值; 请将属性声明修改为 `var ${property.name}`。")
             }
             isMutable
         }
         // 步骤4: 将筛选出来的值使用bindTo变成新的集合
         .map { (property, bind) -> bind.bindTo(property as KMutableProperty1<*, *>) }
 
-/** 查找类下边的可变属性; 先按照定义顺序排序; 再进行过滤，过滤出可变属性。 */
+/** 查找类下边的可变属性;
+ *
+ * 先按照定义顺序排序; 再进行过滤，过滤出可变属性。 */
 val <T : Any> KClass<T>.memberMutableProperties: List<KMutableProperty1<*,*>>
     get() = getOrderProperties().filterIsInstance<KMutableProperty1<*,*>>()
 /**
@@ -83,13 +82,15 @@ fun <T : Any> KClass<T>.getOrderProperties(): List<KProperty1<T, *>> {
         .map { it.first }
 }
 /**
- * 将 KClass<*> 转换为通用的枚举类类型 KClass<out Enum<*>>。
- * 注意：返回的是通配符类型，表示"某个枚举类型"，但不知道具体是哪种枚举。
+ * 将 KClass<> 转换为通用的枚举类类型 KClass<out Enum<>>。
+ *
+ * 注意：返回的是通配符类型，表示"某个枚举类型"，但不知道具体是哪种枚举。并且如果不是枚举类型，则返回 null
  *
  * 这在你只需要枚举的通用操作（如获取 name、ordinal）时有用。
  * 但不能进行类型安全的特定枚举操作。
  */
 fun KClass<*>.safeAsEnumClass(): KClass<out Enum<*>>? =
+    // 检查类型是否是枚举类型，如果是则强制转换为枚举，不是则返回 null
     takeIf { it.java.isEnum && Enum::class.java.isAssignableFrom(it.java) }
         ?.let {
             // 由于类型擦除，这里需要不安全的转换,  但我们通过 isEnum 检查确保了安全

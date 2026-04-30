@@ -1,28 +1,28 @@
-package demo.dataModel.did
+package demo.dataModel.udsDataModel.did
 
-import core.GridBind
+import core.GridColumnBind
 import core.GridValueType
 
 /**
  * 存储位置 - 使用枚举类
  */
 enum class DidStoragePosition(
-    @property:GridBind(headerText = "", pattern = "", valueType = GridValueType.Enum)
+    @property:GridColumnBind(headerText = "", pattern = "", valueType = GridValueType.Enum)
     val displayName: String
 ) {
-    @GridBind(headerText = "FLASH", pattern = "FLASH")
+    @GridColumnBind(headerText = "FLASH", pattern = "FLASH")
     FLASH("FLASH"),
 
-    @GridBind(headerText = "EEPROM", pattern = "EEPROM")
+    @GridColumnBind(headerText = "EEPROM", pattern = "EEPROM")
     EEPROM("EEPROM"),
 
-    @GridBind(headerText = "ROM", pattern = "ROM")
+    @GridColumnBind(headerText = "ROM", pattern = "ROM")
     ROM("ROM"),
 
-    @GridBind(headerText = "RAM", pattern = "RAM")
+    @GridColumnBind(headerText = "RAM", pattern = "RAM")
     RAM("RAM"),
 
-    @GridBind(headerText = "TBD", pattern = "TBD")
+    @GridColumnBind(headerText = "TBD", pattern = "TBD")
     TBD("TBD");
 
     companion object {
@@ -35,19 +35,19 @@ enum class DidStoragePosition(
  * DID 访问权限 - 使用枚举类
  */
 enum class DIDAccessPermission(
-    @property:GridBind(headerText = "", pattern = "", valueType = GridValueType.Enum)
+    @property:GridColumnBind(headerText = "", pattern = "", valueType = GridValueType.Enum)
     val displayName: String
 ) {
-    @GridBind(
+    @GridColumnBind(
         headerText = "Write",
         pattern = "\\s*(read|Read|READ)\\s*(and|And|AND)\\s*(Write|write|WRITE)\\s*"
     )
     READ_AND_WRITE("Write"),
 
-    @GridBind(headerText = "Readonly", pattern = "(Readonly|readonly|ReadOnly)")
+    @GridColumnBind(headerText = "Readonly", pattern = "(Readonly|readonly|ReadOnly)")
     READONLY("Readonly"),
 
-    @GridBind(headerText = "None", pattern = "None")
+    @GridColumnBind(headerText = "None", pattern = "None")
     NONE("None");
 
     companion object {
@@ -64,7 +64,7 @@ enum class DIDCodeFormat(
     val pattern: String,
     val description: String
 ) {
-    @GridBind(
+    @GridColumnBind(
         headerText = "Unsigned",
         pattern = "Hex|hex|HEX|无符号|((Hex|hex|HEX)?\\s*[(（]?\\s*(Unsigned|unsigned|UNSIGNED)\\s*[)）]?)"
     )
@@ -73,7 +73,7 @@ enum class DIDCodeFormat(
         description = "无符号类型，例如车辆配置"
     ),
 
-    @GridBind(
+    @GridColumnBind(
         headerText = "Singed",
         pattern = "有符号|(?<!(Un|un|UN))Signed|(?<!(Un|un|UN))signed|(?<!(Un|un|UN))SIGNED"
     )
@@ -82,26 +82,26 @@ enum class DIDCodeFormat(
         description = "有符号类型"
     ),
 
-    @GridBind(headerText = "ASCII", pattern = "ASCII|ascii|Ascii")
+    @GridColumnBind(headerText = "ASCII", pattern = "ASCII|ascii|Ascii")
     ASCII(
         pattern = "ASCII|ascii|Ascii",
         description = "ASCII码格式，用于文本和VIN"
     ),
 
-    @GridBind(headerText = "BCD", pattern = "BCD|bcd|Bcd")
+    @GridColumnBind(headerText = "BCD", pattern = "BCD|bcd|Bcd")
     BCD(
         pattern = "BCD|bcd|Bcd",
         description = "BCD格式，用于日期表示"
     ),
 
-    @GridBind(headerText = "SubData", pattern = "SubData|subData|subdata")
+    @GridColumnBind(headerText = "SubData", pattern = "SubData|subData|subdata")
     SUB_DATA(
         pattern = "SubData|subData|subdata",
         description = "表示DID由多个子信号组成"
     ),
 
     @Deprecated("不再使用二进制格式")
-    @GridBind(headerText = "Bin", pattern = "bin|BIN|Bin")
+    @GridColumnBind(headerText = "Bin", pattern = "bin|BIN|Bin")
     BIN(
         pattern = "bin|BIN|Bin",
         description = "二进制格式（已弃用）"
@@ -139,13 +139,13 @@ enum class CanByteOrder(
     val displayName: String,
     val isMotorola: Boolean = false
 ) {
-    @GridBind(headerText = "Intel", pattern = "Intel|INTEL|intel")
+    @GridColumnBind(headerText = "Intel", pattern = "Intel|INTEL|intel")
     INTEL("Intel", false),
 
-    @GridBind(headerText = "Motorola_MSB", pattern = "Motorola_MSB|Motorola MSB|MSB")
+    @GridColumnBind(headerText = "Motorola_MSB", pattern = "Motorola_MSB|Motorola MSB|MSB")
     MOTOROLA_MSB("Motorola_MSB", true),
 
-    @GridBind(headerText = "Motorola_LSB", pattern = "Motorola_LSB|Motorola LSB|LSB")
+    @GridColumnBind(headerText = "Motorola_LSB", pattern = "Motorola_LSB|Motorola LSB|LSB")
     MOTOROLA_LSB("Motorola_LSB", true);
 
     companion object {

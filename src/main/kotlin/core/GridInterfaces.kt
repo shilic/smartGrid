@@ -11,14 +11,14 @@ interface IGridChild {
     var gridFather : String
 }
 /** 表格数据行下标接口，用于记录对象的行下标 */
-interface IGridRow {
+interface IGridRowIndex {
     /** 表格数据行下标接口，用于记录对象的行下标 */
     var gridRowIndex : Int?
 }
-/** 表格数据接口。用于规范描述一行数据。
+/** 行数据接口。作用于类上，用于规范描述一行数据。
  *
  * 包括: 行数据的关键字、行数据的父级元素、行下标。 */
-interface IGridData : IGridKey, IGridChild, IGridRow
+interface IGridRowData : IGridKey, IGridChild, IGridRowIndex
 
 /** table接口。用于指示该数据是一个 完整表格 + 额外数据。
  *
@@ -31,13 +31,16 @@ interface IGridData : IGridKey, IGridChild, IGridRow
  *
  * @param T 泛型T，需要实现 IGridData 接口。表示该 IGridTable 接口负责管理何种类型的数据。
  * */
-interface IGridTable<T : IGridData> {
+interface IGridTable<T : IGridRowData> {
     /* 实现类自己需要定义自己的额外字段，以对应表格中的列标题。 */
     /** 在表格组件中的表格名称，框架会根据该变量的名称，到表格组件中去寻找对应的工作表。 */
     val specificTable: String
     /** 持有的表格数据 */
     val tableMap: MutableMap<String, T>
 }
+
+
+
 /** 子数据拥有者, 使用行序号保存子数据对象 */
 interface SubDataOwner {
     /**  使用行序号保存子数据对象 */
