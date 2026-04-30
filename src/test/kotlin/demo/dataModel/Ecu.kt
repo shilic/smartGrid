@@ -1,6 +1,7 @@
 package demo.dataModel
 
 import core.*
+import demo.dataModel.did.EOLDid
 
 @SheetBind(sheetName = "Ecu Info",  pattern = "零部件信息|((Ecu|ecu|ECU)\\\\s*(Info|info|INFO))", sheetDataType = SheetDataType.Single)
 class Ecu : IGridData {
@@ -9,7 +10,7 @@ class Ecu : IGridData {
     override var gridFather: String = ""
     override var gridRowIndex: Int? = null
     // ==================== 2. 零部件基础信息 ====================
-    @GridBind("零部件名称", "零部件名称", GridValueType.Text)
+    @GridBind("零部件名称", "零部件名称", GridValueType.Text, keyword = true)
     var ecuName: String = ""
     @GridBind("零部件大类", "零部件大类", GridValueType.Text)
     var ecuCategory: String = ""
@@ -32,4 +33,6 @@ class Ecu : IGridData {
 
     @GridBind(headerText = "DTCList", valueType = GridValueType.OtherPage)
     var dtcDefineMap : MutableMap<String, Dtc> = mutableMapOf()
+    @GridBind(headerText = "EOLConfigDID", valueType = GridValueType.OtherPage)
+    var eolDidMap : MutableMap<String, EOLDid> = mutableMapOf()
 }

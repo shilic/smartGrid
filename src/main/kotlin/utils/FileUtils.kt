@@ -36,9 +36,6 @@ val String.parentPath: String get() = File(this).parent ?: ""
 val String.normalizedPath: String get() = File(this).canonicalPath
 
 // ======================== 基本检查 ========================
-/**
- * 扩展属性版本
- */
 val String.absolutePath: String get() =  File(this).absolutePath
 val String.exists: Boolean get() = File(this).exists()
 val String.isFile: Boolean get() = File(this).isFile

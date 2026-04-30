@@ -15,7 +15,7 @@ class Dtc  : IGridData {
 
     // ====================== 2. 故障核心信息 ====================
     /** 主键：DTC 的 16 进制值 */
-    @GridBind(headerText = "DtcHexNumber", pattern = "DTC值|DtcHexNumber|((DTC|dtc|Dtc)\\s*(Byte|byte|BYTE))", valueType = GridValueType.HexNumber)
+    @GridBind(headerText = "DtcHexNumber", pattern = "DTC值|DtcHexNumber|((DTC|dtc|Dtc)\\s*(Byte|byte|BYTE))", valueType = GridValueType.HexNumber, keyword = true)
     var dtcHexNumber: UInt = 0u
     /** DTC 英文名称 */
     @GridBind(headerText = "DTC英文名称", pattern = "DTC英文名称", valueType = GridValueType.Text)

@@ -1,0 +1,88 @@
+package demo.dataModel.did
+
+import core.*
+import java.util.concurrent.locks.ReentrantReadWriteLock
+import kotlin.concurrent.read
+import kotlin.concurrent.write
+
+/**
+ * DID 子信号 - 使用数据类
+ * 现在所有类型都使用枚举，代码更简洁
+ */
+@SheetBind(sheetDataType = SheetDataType.SubSignal)
+class DidSignal: IGridData, IValueTable, SubDataOwner {
+    // 必选参数
+    @GridBind(headerText = "子数据名称", pattern = "子数据名称", valueType = GridValueType.Text, uiIgnore = true, keyword = true)
+    var signalName: String = ""
+
+    @GridBind(headerText = "子数据描述", pattern = "子数据描述", valueType = GridValueType.Text)
+    var signalDescription: String = ""
+
+    @GridBind(headerText = "子数据起始位", pattern = "子数据起始位", valueType = GridValueType.Number, uiIgnore = true)
+    var startBit: Int = 0
+
+    @GridBind(headerText = "子数据长度", pattern = "子数据长度", valueType = GridValueType.Number, uiIgnore = true)
+    var bitLength: Int = 0
+
+    @GridBind(headerText = "子数据排列格式", pattern = "排列格式", valueType = GridValueType.Enum, uiIgnore = true)
+    var byteOrder: CanByteOrder = CanByteOrder.INTEL
+
+    @GridBind(headerText = "子数据编码格式", pattern = "编码格式", valueType = GridValueType.Enum, uiIgnore = true)
+    var didCodeFormat: DIDCodeFormat = DIDCodeFormat.UNSIGNED
+
+    @GridBind(headerText = "子数据精度", pattern = "精度", valueType = GridValueType.Number, uiIgnore = true)
+    var factor: Double = 1.0
+
+    @GridBind(headerText = "子数据偏移量", pattern = "偏移量", valueType = GridValueType.Number, uiIgnore = true)
+    var offset: Double = 0.0
+
+    // 可选参数
+    @GridBind(headerText = "子数据单位", pattern = "单位", valueType = GridValueType.Text, uiIgnore = true)
+    var unit: String? = null
+
+    @GridBind(headerText = "子数据值描述", pattern = "值描述", valueType = GridValueType.ValueTable, uiIgnore = true)
+    override var valueTable: MutableMap<Int, String> = mutableMapOf()
+    // 计算属性 - 使用表达式体函数
+    val sizeBytes: Int get() = (bitLength + 7) / 8
+
+    // 编码/解码时的变量 - 使用委托属性进行线程安全访问
+    @Transient
+    private var _rawBytes: ByteArray = byteArrayOf(0)
+
+    @Transient
+    private var _didText: String = ""
+
+    @Transient
+    private var _phyValue: Double = 0.0
+
+    // 线程安全访问 - 使用读写锁
+    @Transient
+    private val lock = ReentrantReadWriteLock()
+
+    var rawBytes: ByteArray
+        get() = lock.read { _rawBytes }
+        set(value) = lock.write { _rawBytes = value }
+
+    var didText: String
+        get() = lock.read { _didText }
+        set(value) = lock.write { _didText = value }
+
+    var phyValue: Double
+        get() = lock.read { _phyValue }
+        set(value) = lock.write { _phyValue = value }
+
+    // IGridData 接口实现
+
+    override val gridKey: String get() = signalName
+    override var gridFather: String = ""
+    override var gridRowIndex: Int? = null
+
+    override var aValue: String
+        get() = didText
+        set(value) { didText = value }
+
+    // SubDataOwner 接口实现
+    @Transient
+    override var subObjectMap: MutableMap<Int, Any> = mutableMapOf()
+    override fun toString(): String = "[子数据, 名称: $signalName, 描述: $signalDescription]"
+}

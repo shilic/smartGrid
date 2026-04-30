@@ -23,6 +23,8 @@ annotation class GridBind (
     /** customAdapter : 自定义的适配器名称。 当 绑定值的类型 valueType 为  GridValueType.CustomAdapter时，使用该字段;
      * 用于获取自定义的适配器，再由框架调用自定义的识别规则。 */
     val customAdapter : String = "",
+    /** keyword : 关键字 */
+    val keyword : Boolean = false,
 )
 /**  扩展函数，让GridBind可以直接绑定到 KMutableProperty1<*,*> 属性， */
 fun GridBind.bindTo(kMutableProperty: KMutableProperty1<*,*>): GridInfo {

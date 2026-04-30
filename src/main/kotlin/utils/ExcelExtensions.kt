@@ -53,13 +53,13 @@ fun Sheet.getLastRowIndex(): Int  = when {
  * 判断一行是否包含有效数据(非空); 只要一行至少有一个单元格有内容，返回真;
  * 使用 Kotlin 的作用域函数和 any 函数优化性能
  */
-fun Row.isRowNonEmpty(): Boolean = iterator().asSequence().any { cell -> cell.hasContent() }
+fun Row.isRowNonEmpty(): Boolean = iterator().asSequence().any { cell -> cell.isNotBlank() }
 
 /**
  * 检查单元格是否包含有效内容(非空和非空白)
  * 使用 Kotlin 的 when 表达式，清晰表达多条件判断
  */
-fun Cell.hasContent(): Boolean = when {
+fun Cell.isNotBlank(): Boolean = when {
     cellType == CellType.BLANK -> false
     else -> toString().isNotBlank()
 }
@@ -80,7 +80,7 @@ fun Row.getLastColumnIndex(): Int = when {
         val lastPossibleIndex = lastCellNum - 1
         (lastPossibleIndex downTo 0)
             .firstOrNull { columnIndex ->
-                getCell(columnIndex)?.hasContent() == true
+                getCell(columnIndex)?.isNotBlank() == true
             } ?: 0
     }
 }

@@ -1,4 +1,4 @@
-package demo.utils
+package utils
 
 import com.google.gson.*
 import com.google.gson.reflect.TypeToken
@@ -126,7 +126,6 @@ private class UIntAdapter : JsonSerializer<UInt>, JsonDeserializer<UInt> {
         return hexStr.toUIntOrNull(16)
     }
 }
-
 private class ULongAdapter : JsonSerializer<ULong>, JsonDeserializer<ULong> {
     override fun serialize(src: ULong?, typeOfSrc: java.lang.reflect.Type?, context: JsonSerializationContext): JsonElement {
         return src?.let { JsonPrimitive("0x${it.toString(16).uppercase()}") } ?: JsonNull.INSTANCE
@@ -143,7 +142,6 @@ private class ULongAdapter : JsonSerializer<ULong>, JsonDeserializer<ULong> {
         return hexStr.toULongOrNull(16)
     }
 }
-
 private class UShortAdapter : JsonSerializer<UShort>, JsonDeserializer<UShort> {
     override fun serialize(src: UShort?, typeOfSrc: java.lang.reflect.Type?, context: JsonSerializationContext): JsonElement {
         return src?.let { JsonPrimitive("0x${it.toString(16).uppercase()}") } ?: JsonNull.INSTANCE
@@ -160,7 +158,6 @@ private class UShortAdapter : JsonSerializer<UShort>, JsonDeserializer<UShort> {
         return hexStr.toUShortOrNull(16)
     }
 }
-
 private class UByteAdapter : JsonSerializer<UByte>, JsonDeserializer<UByte> {
     override fun serialize(src: UByte?, typeOfSrc: java.lang.reflect.Type?, context: JsonSerializationContext): JsonElement {
         return src?.let { JsonPrimitive("0x${it.toString(16).uppercase()}") } ?: JsonNull.INSTANCE
@@ -212,7 +209,6 @@ private class IntArrayHexAdapter : PrimitiveArrayHexAdapter<IntArray>() {
     override fun fromJsonArray(jsonArray: JsonArray) =
         IntArray(jsonArray.size()) { jsonArray[it].asString.substring(2).toInt(16) }
 }
-
 private class LongArrayHexAdapter : PrimitiveArrayHexAdapter<LongArray>() {
     override fun toHexArray(array: LongArray) = JsonArray().apply {
         array.forEach { add("0x${it.toULong().toString(16).uppercase()}") }
@@ -220,7 +216,6 @@ private class LongArrayHexAdapter : PrimitiveArrayHexAdapter<LongArray>() {
     override fun fromJsonArray(jsonArray: JsonArray) =
         LongArray(jsonArray.size()) { jsonArray[it].asString.substring(2).toLong(16) }
 }
-
 private class ShortArrayHexAdapter : PrimitiveArrayHexAdapter<ShortArray>() {
     override fun toHexArray(array: ShortArray) = JsonArray().apply {
         array.forEach { add("0x${it.toUShort().toString(16).uppercase()}") }
@@ -228,7 +223,6 @@ private class ShortArrayHexAdapter : PrimitiveArrayHexAdapter<ShortArray>() {
     override fun fromJsonArray(jsonArray: JsonArray) =
         ShortArray(jsonArray.size()) { jsonArray[it].asString.substring(2).toShort(16) }
 }
-
 private class ByteArrayHexAdapter : PrimitiveArrayHexAdapter<ByteArray>() {
     override fun toHexArray(array: ByteArray) = JsonArray().apply {
         array.forEach { add("0x${it.toUByte().toString(16).uppercase()}") }
@@ -267,7 +261,6 @@ private class UIntArrayHexAdapter : TypeAdapter<UIntArray>() {
         return list.toUIntArray()
     }
 }
-
 @OptIn(ExperimentalUnsignedTypes::class)
 private class ULongArrayHexAdapter : TypeAdapter<ULongArray>() {
     override fun write(writer: JsonWriter, value: ULongArray?) {
@@ -295,7 +288,6 @@ private class ULongArrayHexAdapter : TypeAdapter<ULongArray>() {
         return list.toULongArray()
     }
 }
-
 @OptIn(ExperimentalUnsignedTypes::class)
 private class UShortArrayHexAdapter : TypeAdapter<UShortArray>() {
     override fun write(writer: JsonWriter, value: UShortArray?) {
@@ -323,7 +315,6 @@ private class UShortArrayHexAdapter : TypeAdapter<UShortArray>() {
         return list.toUShortArray()
     }
 }
-
 @OptIn(ExperimentalUnsignedTypes::class)
 private class UByteArrayHexAdapter : TypeAdapter<UByteArray>() {
     override fun write(writer: JsonWriter, value: UByteArray?) {
@@ -361,7 +352,6 @@ private class IntArrayObjectAdapter : PrimitiveArrayHexAdapter<Array<Int>>() {
     override fun fromJsonArray(jsonArray: JsonArray) =
         Array(jsonArray.size()) { jsonArray[it].asString.substring(2).toInt(16) }
 }
-
 private class LongArrayObjectAdapter : PrimitiveArrayHexAdapter<Array<Long>>() {
     override fun toHexArray(array: Array<Long>) = JsonArray().apply {
         array.forEach { add("0x${it.toULong().toString(16).uppercase()}") }
@@ -369,7 +359,6 @@ private class LongArrayObjectAdapter : PrimitiveArrayHexAdapter<Array<Long>>() {
     override fun fromJsonArray(jsonArray: JsonArray) =
         Array(jsonArray.size()) { jsonArray[it].asString.substring(2).toLong(16) }
 }
-
 private class ShortArrayObjectAdapter : PrimitiveArrayHexAdapter<Array<Short>>() {
     override fun toHexArray(array: Array<Short>) = JsonArray().apply {
         array.forEach { add("0x${it.toUShort().toString(16).uppercase()}") }
@@ -377,7 +366,6 @@ private class ShortArrayObjectAdapter : PrimitiveArrayHexAdapter<Array<Short>>()
     override fun fromJsonArray(jsonArray: JsonArray) =
         Array(jsonArray.size()) { jsonArray[it].asString.substring(2).toShort(16) }
 }
-
 private class ByteArrayObjectAdapter : PrimitiveArrayHexAdapter<Array<Byte>>() {
     override fun toHexArray(array: Array<Byte>) = JsonArray().apply {
         array.forEach { add("0x${it.toUByte().toString(16).uppercase()}") }
@@ -412,7 +400,6 @@ private class UIntObjectArrayAdapter : TypeAdapter<Array<UInt>>() {
         return list.toTypedArray()
     }
 }
-
 private class ULongObjectArrayAdapter : TypeAdapter<Array<ULong>>() {
     override fun write(writer: JsonWriter, value: Array<ULong>?) {
         if (value == null) {
@@ -439,7 +426,6 @@ private class ULongObjectArrayAdapter : TypeAdapter<Array<ULong>>() {
         return list.toTypedArray()
     }
 }
-
 private class UShortObjectArrayAdapter : TypeAdapter<Array<UShort>>() {
     override fun write(writer: JsonWriter, value: Array<UShort>?) {
         if (value == null) {
@@ -495,6 +481,7 @@ private class UByteObjectArrayAdapter : TypeAdapter<Array<UByte>>() {
 /**
  * List 适配器工厂
  */
+@Suppress("UNCHECKED_CAST")
 private class ListHexAdapterFactory : TypeAdapterFactory {
 
     override fun <T> create(gson: Gson, type: TypeToken<T>): TypeAdapter<T>? {
@@ -516,6 +503,7 @@ private class ListHexAdapterFactory : TypeAdapterFactory {
 /**
  * Set 适配器工厂
  */
+@Suppress("UNCHECKED_CAST")
 private class SetHexAdapterFactory : TypeAdapterFactory {
 
     override fun <T> create(gson: Gson, type: TypeToken<T>): TypeAdapter<T>? {
@@ -537,6 +525,7 @@ private class SetHexAdapterFactory : TypeAdapterFactory {
 /**
  * 泛型 List 适配器
  */
+@Suppress("UNCHECKED_CAST")
 private class ListHexAdapter<T : Number>(private val elementClass: Class<T>) : TypeAdapter<List<T>>() {
 
     override fun write(writer: JsonWriter, value: List<T>?) {
@@ -586,6 +575,7 @@ private class ListHexAdapter<T : Number>(private val elementClass: Class<T>) : T
 /**
  * 泛型 Set 适配器
  */
+@Suppress("UNCHECKED_CAST")
 private class SetHexAdapter<T : Number>(private val elementClass: Class<T>) : TypeAdapter<Set<T>>() {
 
     override fun write(writer: JsonWriter, value: Set<T>?) {
@@ -632,9 +622,6 @@ private class SetHexAdapter<T : Number>(private val elementClass: Class<T>) : Ty
     }
 }
 
-/**
- * Kotlin扩展函数，更优雅的使用方式
- */
-inline fun <reified T> T.toJsonString(): String = GsonAdapter.gson.toJson(this)
+inline fun <reified T> T.toGsonString(): String = GsonAdapter.gson.toJson(this)
 
-inline fun <reified T> String.fromJsonString(): T = GsonAdapter.gson.fromJson(this, T::class.java)
+inline fun <reified T> String.fromGsonString(): T = GsonAdapter.gson.fromJson(this, T::class.java)

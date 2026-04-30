@@ -13,39 +13,35 @@ import kotlin.reflect.jvm.javaField
 
 /** 动态字典，支持在运行时确定键值类型 */
 fun <K : Any, V : Any> createTypedMap(keyType: KClass<K>, valueType: KClass<V>): MutableMap<K, V> {
-    return HashMap()
+    return LinkedHashMap<K, V>()
 }
 /**
  * 使用反射, 从类型上的所有属性获取绑定的 GridInfo 信息
  *
- * @param filter 自定义过滤条件，为 null 时不进行过滤
- * @param defaultFilter 是否使用默认过滤条件（pattern 非空 或 valueType = OtherPage）; 当你要获取所有注解时，使 defaultFilter 为 false ;
- *
- * 注意：当同时提供 filter 时，defaultFilter 会被忽略;
+ * @param filter 是否使用默认过滤条件（pattern 非空 或 valueType = OtherPage）; 当你要获取所有注解时，使 defaultFilter 为 false ;
  */
-fun KClass<*>.getGridInfos(filter: ((GridBind) -> Boolean)? = null, defaultFilter: Boolean = true): List<GridInfo> = memberMutableProperties
-    .mapNotNull { kMutableProperty -> kMutableProperty.findAnnotation<GridBind>()
-        ?.let { annotation ->
-            when {
-                // 1. 优先使用自定义过滤条件
-                filter != null -> annotation.takeIf(filter)
-                // 2. 使用默认过滤条件 (当同时提供 filter 时，defaultFilter 会被忽略)
-                /* 规则1 : 如果 正则表达式 pattern 那一项没有值，则忽略这一项。
-                * 例如某些值，你只是填写了列标题，只是想在UI界面进行展示，而不需要从 excel 表格进行识别。
-                * 使用 takeIf { it.pattern.isNotBlank() } 过滤出 pattern 非空的值。
-                *
-                * 规则2 : 如果该字段的数据来源是其他页面, valueType = OtherPage ，则忽略 pattern 的空值检查。
-                * (关键逻辑) (valueType 标记为 OtherPage 时，不需要填写 pattern)
-                * 这个时候添加正则表达式没用，因为数据不在当前表格, 就算填写了 pattern 之后, 也无法从当前表格获取列下标, 只有到另外的表格进行查询。
-                * 故需要筛选出全部的 valueType = OtherPage 的注解。
-                *
-                * 也就是说，需要筛选出 pattern 有值，或者 valueType = OtherPage 的注解。  */
-                defaultFilter -> annotation.takeIf { it.pattern.isNotBlank() || it.valueType == GridValueType.OtherPage }
-                // 3. 不过滤，返回所有注解
-                else -> annotation
-            }?.bindTo(kMutableProperty)
+fun KClass<*>.getGridInfos(filter: Boolean = true): List<GridInfo> =
+    getOrderProperties()
+        // 步骤1: 创建GridBind注解(筛选注解不为空)和属性的键值对集合
+        .mapNotNull { property -> property.findAnnotation<GridBind>()?.let { property to it } }
+        // 步骤2: 使用kotlin的函数筛选注解的 pattern 和 valueType 。(filter 为 false 时，立刻放弃筛选。)
+        .filter { (_, bind) -> !filter || bind.pattern.isNotBlank() || bind.valueType == GridValueType.OtherPage }
+        // 步骤3: 筛选可变属性
+        .filter { (property, _) ->
+            val isMutable = property is KMutableProperty1<*, *>
+            // 当默认过滤开启, 且属性不可变时，抛异常
+            if (!isMutable && filter) {
+                throw IllegalArgumentException("""
+                    类型"${this.simpleName}"上的属性"${property.name}"必须为可变属性，
+                    因为标注了${GridBind::class.simpleName}注解且需要反射赋值。
+                    请将属性声明修改为 `var ${property.name}`。
+                """.trimIndent())
+            }
+            isMutable
         }
-    }
+        // 步骤4: 将筛选出来的值使用bindTo变成新的集合
+        .map { (property, bind) -> bind.bindTo(property as KMutableProperty1<*, *>) }
+
 /** 查找类下边的可变属性; 先按照定义顺序排序; 再进行过滤，过滤出可变属性。 */
 val <T : Any> KClass<T>.memberMutableProperties: List<KMutableProperty1<*,*>>
     get() = getOrderProperties().filterIsInstance<KMutableProperty1<*,*>>()

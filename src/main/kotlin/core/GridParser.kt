@@ -10,21 +10,15 @@ import kotlin.reflect.KType
 
 /**
  * 表格解析器，用于解析 Excel 工作簿到任意对象
+ *
+ * @param workbook 传入一个工作表接口 Workbook
  */
-class GridParser(private val filePath: String) {
+class GridParser(private val workbook: Workbook) {
     companion object {
         private val LOG_TAG = GridParser::class.simpleName
     }
-    /** POI 工作簿 */
-    private val workbook: Workbook by lazy { createWorkbook(filePath) }
     /** 使用表名保存对应的表格 */
-    private val sheetMap: Map<String, Sheet> by lazy { workbook.getSheetMap() }
-    init {
-        require(filePath.isNotBlank()) { "文件路径为空，无法识别文件。" }
-        require(filePath.exists) { "文件不存在，没找到指定文件: $filePath" }
-        val fileExtension = filePath.fileExtension.lowercase()
-        require(SUPPORTED_EXCEL_EXTENSIONS.contains(fileExtension)){"${LOG_TAG}: 不支持的文件格式: $fileExtension, 必须是\"xls\", \"xlsx\"文件"}
-    }
+    private val sheetMap: Map<String, Sheet> = workbook.getSheetMap()
     /**
      * 主函数: 解析指定表格
      * @param objectType 指定表格数据的接收类型，需要在类型定义的字段中标记绑定哪一列
@@ -36,7 +30,7 @@ class GridParser(private val filePath: String) {
         val (sheet, sheetDataType) = checkSheet(objectType)
         // 如果没有该表格，则返回空集合
         if (sheet == null) { return createTypedMap(String::class, objectType) }
-        val rowIndex = RefValue(0)
+        val rowIndex = Ref(0)
         // 传入表格和类型进行解析
         return parseBySheet(sheet, objectType, sheetDataType, rowIndex, father)
     }
@@ -44,16 +38,11 @@ class GridParser(private val filePath: String) {
     /**
      * 解析一个 sheet，返回包含 sheet 数据的字典
      */
-    private fun <T : Any> parseBySheet(
-        sheet: Sheet,
-        objectType: KClass<T>,
-        sheetDataType: SheetDataType,
-        rowIndex: RefValue<Int>,
-        father: IGridData? = null
-    ): Map<String, T> {
+    private fun <T : Any> parseBySheet(sheet: Sheet, objectType: KClass<T>, sheetDataType: SheetDataType, rowIndex: Ref<Int>, father: IGridData? = null): Map<String, T> {
         // 获取表头，输出对应的字段和表头信息
         val (titleRow, columnBindInfos) = getTitle(sheet, objectType)
-
+        println("行数据关键字 = ${columnBindInfos.first().gridBind.headerText}")
+        println("columnBindInfos = ${columnBindInfos.toGsonString()}")
         // 将对象的字段和表格中的列绑定到一起，记录对应表头的列序号
         getBindColumnIndex(titleRow, columnBindInfos)
         val firstRowIndex = titleRow.rowNum + 1
@@ -75,13 +64,13 @@ class GridParser(private val filePath: String) {
         sheet: Sheet,
         sheetDataType: SheetDataType,
         objectType: KClass<T>,
-        rowIndex: RefValue<Int>,
+        rowIndex: Ref<Int>,
         lastRowIndex: Int,
         columnBindInfos: List<GridInfo>,
         resultMap: MutableMap<String, T>,
         father: IGridData? = null
     ) {
-        // 遍历所有行，添加数据
+        // 外层循环，遍历所有行，添加数据
         loopRow@
         while (rowIndex.value <= lastRowIndex) {
             // 通过反射实例化对象
@@ -95,10 +84,11 @@ class GridParser(private val filePath: String) {
                 println("${objectType.simpleName} 未实现 IChild")
             }
 
-            val row = sheet.getRow(rowIndex.value) ?: continue
+            val row = sheet.getRow(rowIndex.value) ?: continue@loopRow
 
-            // ----------------------------- 校验第一个单元格 ------------------------
-            val firstColumnIndex = columnBindInfos.first().let { bind ->
+            // ----------------------------- 校验第一个单元格 gridInfo -> gridInfo.gridBind.keyword  ------------------------
+            val firstColumnIndex = columnBindInfos.first ().let { bind ->
+
                 requireNotNull(bind.columnIndex) { "第一个绑定字段“${bind.gridBind.headerText}”必须存在列索引" }
             }
             val firstCell = row.getCell(firstColumnIndex)
@@ -106,69 +96,77 @@ class GridParser(private val filePath: String) {
              * 并且第一个单元格(这里的第一个单元格当然就是指的子信号的第一个单元格)为空，则说明子信号解析完成，需要结束全部循环，并返回值。
              * 同时将 rowIndex 记录为 最后一行的下标, rowIndex -= 1 , 回退到上一行, 出栈。*/
             // 处理子信号的特殊退出条件
-            if (sheetDataType == SheetDataType.SubSignal && !firstCell.hasContent()) {
+            if (sheetDataType == SheetDataType.SubSignal && !firstCell.isNotBlank()) {
                 // 回退到上一行，这里会出栈，退出嵌套 , 同时返回这个下标。
                 rowIndex.value -= 1
-                break
+                println("是子信号，并且子信号第一个单元格为空。退出子信号嵌套解析逻辑。sheet = ${sheet.sheetName}, rowIndex = ${rowIndex.value}")
+                break@loopRow
             }
             // 如果第一个单元格为空且不是子信号，说明这一行没有记录，跳过这一行。如果这一行是子信号，那么也会跳过。但是子信号已经在嵌套逻辑中解析了。
-            if (sheetDataType != SheetDataType.SubSignal && !firstCell.hasContent()) {
-                rowIndex.value++
-                continue
+            if (sheetDataType != SheetDataType.SubSignal && !firstCell.isNotBlank()) {
+                rowIndex.value += 1
+                println("不是子信号，并且行第一个单元格(关键字单元格)为空。跳过这一行。sheet = ${sheet.sheetName}, rowIndex = ${rowIndex.value}")
+                continue@loopRow
             }
             // 如果第一个元素有删除线，跳过整行
-            if (firstCell.isStrikeThrough() && firstCell.hasContent()) {
-                rowIndex.value++
-                continue
+            if (firstCell.isStrikeThrough() && firstCell.isNotBlank()) {
+                rowIndex.value += 1
+                println("存在删除线，并且单元格有值。跳过这一行。sheet = ${sheet.sheetName}, rowIndex = ${rowIndex.value}")
+                continue@loopRow
             }
 
-            // 遍历绑定信息（遍历一行）
+            // 内层循环。  遍历绑定信息（遍历一行）
             columnBindInfos.forEach { bind ->
                 var exCell : String? = null
-                try {
+                val value : Any
+                //try {
                     when (bind.gridBind.valueType) {
-                        GridValueType.NotDefined -> throw  IllegalArgumentException("")
+                        // 如果一个字段的注解定义了 识别模式 pattern ，可以识别到单元格， 却没有定义解析的规则。就忽略该值。
+                        GridValueType.NotDefined -> return@forEach
                         /* 获取绑定的列下标。(关键) 如果某一列没有, 说明表格中没有对应的表头，则忽略这个字段，跳过这个单元格。但是不跳过这一行数据。
                         *  这里存在的问题是，如果是 BindValueType.OtherPage 类型，因为没有标注正则表达式，所以也不会有列下标，所以无法找到单元格。所以这里单独对这一类型进行提前判断。 */
                         GridValueType.OtherPage -> {
-                            //println("解析其他页面 : ${bind.gridBind.headerText}，当前元素Key: “${(instance as IKey).gridKey}” ")
-                            val subDataMap = parseOtherPage(bind.kMutableProperty.returnType, instance as IGridData)
-                            bind.kMutableProperty.setter.call(instance, subDataMap)
+                            value = parseOtherPage(bind.kMutableProperty.returnType, instance as IGridData)
                         }
                         else -> {
                             //println("解析字段 : ${bind.gridBind.headerText}，当前元素Key: “${(instance as IKey).gridKey}” ")
                             val columnIndex = bind.columnIndex ?: return@forEach
-                            val cell = row.getCell(columnIndex)
+                            val cell = row.getCell(columnIndex) ?: return@forEach
                             exCell = cell.exCell
-                            /* 针对普通字段，如果单元格为空, 或者没有值, 说明表头下对应单元格没有值, 就跳过这个单元格。
+                            /* TODO 针对普通字段，如果单元格为空, 或者没有值, 说明表头下对应单元格没有值, 就跳过这个单元格。
                             这里必须使用 && cellValueType != CellValueType_.SubSignal 判断，否则会忽略子信号，无法解析, 因为子信号那一个单元格确实为空。*/
-                            if (bind.gridBind.valueType != GridValueType.SubSignal && !cell.hasContent()) {
+                            if (bind.gridBind.valueType != GridValueType.SubSignal && !cell.isNotBlank()) {
                                 return@forEach
                             }
 
                             val cellValue = cell.stringValue.trim()
-                            val parsedValue = when (bind.gridBind.valueType) {
-                                GridValueType.Text, GridValueType.Default -> cellValue
+                            value = when (bind.gridBind.valueType) {
+                                GridValueType.Text -> cellValue
                                 GridValueType.Number -> parseNumber(cell, bind.kMutableProperty.returnType.classifier as KClass<*>)
                                 GridValueType.HexNumber -> parseHexNumber(cellValue, bind.kMutableProperty.returnType.classifier as KClass<*>)
                                 GridValueType.ValueTable -> parseValueTable(cellValue)
                                 GridValueType.Enum -> parseEnum(cellValue, bind.kMutableProperty.returnType.classifier as KClass<*>)
-                                GridValueType.SubSignal -> parseSubSignal(cell.row.sheet, bind.kMutableProperty.returnType, rowIndex, instance as IGridData)
+                                GridValueType.SubSignal -> parseSubSignal(sheet, bind.kMutableProperty.returnType, rowIndex, instance as IGridData)
                                 GridValueType.Bool -> parseBool(cellValue)
                                 GridValueType.Strings -> parseStringArray(cellValue, bind.kMutableProperty.returnType.classifier as KClass<*>)
-                                GridValueType.CustomAdapter -> parseCustomValue(cell, cell.row.sheet, bind.kMutableProperty.returnType, rowIndex)
+                                // GridValueType.Custom -> parseCustomValue(cell, sheet, bind.kMutableProperty.returnType, rowIndex)
                                 else -> cellValue
                             }
-                            bind.kMutableProperty.setter.call(instance, parsedValue)
                         }
                     }
-                } catch (e: Exception) {
-                    throw ExcelException("解析 Excel 表格出现异常，sheet = ${sheet.sheetName}, 单元格下标 = ${exCell}, exception = ${e.message}")
+//                } catch (e: Exception) {
+//                    throw ExcelException("解析 Excel 表格出现异常，sheet = ${sheet.sheetName}, 单元格下标 = ${exCell}, exception = ${e.message}")
+//                }
+                try {
+                    bind.kMutableProperty.setter.call(instance, value)
+                }
+                catch (e: Exception) {
+                    throw ExcelException("[反射设置对象值时出现异常, 接受者类型 : “${instance.javaClass.simpleName}”, 接受者字段类型 : “${bind.kMutableProperty.returnType}”, 接受者字段名称 : “${bind.kMutableProperty.name}”, 写入值 : “$value”, error : ${e.message} ]")
                 }
             }
             // 给对象赋值之后，加入到返回值中
             resultMap[(instance as IGridKey).gridKey] = instance
-            rowIndex.value++
+            rowIndex.value += 1
         }
     }
 
@@ -225,13 +223,24 @@ class GridParser(private val filePath: String) {
     private fun parseNumber(cell: Cell, kClass : KClass<*>): Any {
         val cellValue = cell.stringValue.trim()
         return when {
-            cell.cellType == CellType.NUMERIC -> cell.numericCellValue
+            //cell.cellType == CellType.NUMERIC -> cell.numericCellValue
             cellValue.contains("/") -> cell.parseFraction()
             else -> {
-                val value = cellValue.toDoubleOrNull() ?: throw ExcelException("无法解析Double类型数值: $cellValue")
+                val value : Double = cellValue.toDoubleOrNull() ?: throw ExcelException("无法解析Double类型数值: $cellValue")
                 when (kClass) {
-                    Double::class -> value
+                    Byte::class -> value.toInt().toByte()
+                    Short::class -> value.toInt().toShort()
+                    Int::class -> value.toInt()
+                    Long::class -> value.toLong()
+
+                    UByte::class -> value.toUInt().toUByte()
+                    UShort::class -> value.toUInt().toUShort()
+                    UInt::class -> value.toUInt()
+                    ULong::class -> value.toULong()
+
                     Float::class -> value.toFloat()
+                    Double::class -> value
+
                     BigDecimal::class -> cellValue.toBigDecimalOrNull() ?: throw ExcelException("单元格格式错误，无法解析 $cellValue 为 BigDecimal")
                     else -> value
                 }
@@ -286,13 +295,13 @@ class GridParser(private val filePath: String) {
      * 6. 注意，有无子数据都会嵌套进入子数据识别的逻辑。只是说，如果没有子数据，则会返回没有元素的空集合。
      */
     /**  5. 解析子信号 */
-    private fun parseSubSignal(sheet: Sheet, fieldType: KType, rowIndex: RefValue<Int>, father: IGridData): Map<String, *> {
+    private fun parseSubSignal(sheet: Sheet, fieldType: KType, rowIndex: Ref<Int>, father: IGridData): Map<String, *> {
         // 获取字典类型的值的类型 valueType ，作为下一个函数的输入
         val valueType = fieldType.getDictionaryKeyValueTypes().second
         // 强制指定是 SheetDataType.SubSignal 类型。
         val sheetDataType = SheetDataType.SubSignal
         // 这里需要手动将下标移动到下一行。特别注意，在退出条件里，需要将下标 -1 以 回到上一行。
-        rowIndex.value++
+        rowIndex.value += 1
 
         // 这里需要根据具体类型进行实例化，简化处理
         return parseBySheet(sheet, valueType, sheetDataType, rowIndex, father)
@@ -323,8 +332,8 @@ class GridParser(private val filePath: String) {
     }
 
     /** 9. 解析自定义的数据 */
-    private fun parseCustomValue(cell : Cell, sheet: Sheet, fieldType: KType, rowIndex: RefValue<Int>): Any? {
-        return  null
+    private fun parseCustomValue(cell : Cell, sheet: Sheet, fieldType: KType, rowIndex: Ref<Int>): Any? {
+        return null
     }
 
     // ======================== 辅助方法 ========================
@@ -350,11 +359,11 @@ class GridParser(private val filePath: String) {
     private fun <T : Any> getTitle(sheet: Sheet, objectType: KClass<T>): Pair<Row, List<GridInfo> > {
         val columnBindInfos = objectType.getGridInfos()
 
-        val firstGridInfo = columnBindInfos.firstOrNull() ?: throw ExcelException("请确保类型 ${objectType.simpleName} 的字段中标记了 GridBind 注解")
+        val keywordInfo = columnBindInfos.firstOrNull { bind -> bind.gridBind.keyword } ?: throw ExcelException("请确保类型 ${objectType.simpleName} 的字段中标记了 GridBind 注解, 并且标注关键字 keyword ")
 
-        require(firstGridInfo.gridBind.pattern.isNotBlank()) { "请检查类型 ${objectType.simpleName} 中标记了 GridBind 注解的第一个成员变量上有标注 pattern 属性，否则无法识别表头" }
+        require(keywordInfo.gridBind.pattern.isNotBlank()) { "请检查类型 ${objectType.simpleName} 中标记了 GridBind 注解的 keyword 成员变量上有标注 pattern 属性，否则无法识别表头" }
 
-        val pattern = Regex(firstGridInfo.gridBind.pattern)
+        val pattern = Regex(keywordInfo.gridBind.pattern)
         var titleRow: Row? = null
 
         sheet.forEachCell { cell ->
@@ -369,7 +378,7 @@ class GridParser(private val filePath: String) {
             }
         }
         return requireNotNull(titleRow) {
-            "表格 ${sheet.sheetName} 中没有找到表头，请检查表格是否有第一个查询项 '${firstGridInfo.gridBind.headerText}'"
+            "表格 ${sheet.sheetName} 中没有找到表头，请检查表格是否有第一个查询项 '${keywordInfo.gridBind.headerText}'"
         } to columnBindInfos
     }
 
