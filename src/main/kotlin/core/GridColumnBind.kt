@@ -22,7 +22,7 @@ annotation class GridColumnBind (
     val columnWidth : Int = 200,
     /** customAdapter : 自定义的适配器名称。 当 绑定值的类型 valueType 为  GridValueType.CustomAdapter时，使用该字段;
      * 用于获取自定义的适配器，再由框架调用自定义的识别规则。 */
-    val customAdapter : String = "",
+    val customAdapterName : String = "",
     /** keyword : 关键字 */
     val keyword : Boolean = false,
 )
@@ -71,15 +71,15 @@ class GridColumnInfo private constructor (
     val uiIgnore : Boolean get() = gridColumnBind.uiIgnore
     /** columnWidth : 列宽。 在表格类UI组件(如Grid或者DataGridView时)上显示该字段时的列宽*/
     val columnWidth : Int get() = gridColumnBind.columnWidth
-    /** customAdapter : 自定义的适配器名称。 当 绑定值的类型 valueType 为  GridValueType.CustomAdapter时，使用该字段;
+    /** customAdapterName : 自定义的适配器名称。 当 绑定值的类型 valueType 为  GridValueType.Custom时，使用该字段;
      * 用于获取自定义的适配器，再由框架调用自定义的识别规则。 */
-    val customAdapter : String get() = gridColumnBind.customAdapter
+    val customAdapterName : String get() = gridColumnBind.customAdapterName
     /** keyword : 关键字。用于在从表格组件识别值的时候，判断哪一个单元格是这一行的关键字，关键字的单元格需要不为空。 */
     val keyword : Boolean get() = gridColumnBind.keyword
 
     override val gridKey  get() = cacheKey
     override fun toString(): String {
-        return "{ headerText: ${headerText}, pattern: ${pattern}, valueType: ${valueType}, uiIgnore: ${uiIgnore}, columnWidth: ${columnWidth}, customAdapter: ${customAdapter}, keyword: ${keyword}, columnIndex: $columnIndex, kMutableProperty: ($kMutableProperty), cacheKey: $cacheKey, }\n"
+        return "{ headerText: ${headerText}, pattern: ${pattern}, valueType: ${valueType}, uiIgnore: ${uiIgnore}, columnWidth: ${columnWidth}, customAdapter: ${customAdapterName}, keyword: ${keyword}, columnIndex: $columnIndex, kMutableProperty: ($kMutableProperty), cacheKey: $cacheKey, }\n"
     }
     /** 检查绑定信息是否有效，有效才会加入到UI界面中;
      * 不为空，有标题(用于添加表格列标题)，有数据类型(会根据数据类型添加对应格式的列，文本、数值或者下拉框), 并且没有被忽略(uiIgnore = false)。

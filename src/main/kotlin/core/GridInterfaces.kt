@@ -1,5 +1,9 @@
 package core
 
+import org.apache.poi.ss.usermodel.Sheet
+import org.apache.poi.ss.usermodel.Workbook
+import kotlin.reflect.KClass
+
 /** 一个接口，要求实现类必须给出一个字符串格式的唯一识别键，在生成字典的时候作为该实现类的字典的键 */
 interface IGridKey {
     /** 一个接口，要求实现类必须给出一个字符串格式的唯一识别键，在生成字典的时候作为该实现类的字典的键 */
@@ -29,16 +33,29 @@ interface IGridRowData : IGridKey, IGridChild, IGridRowIndex
  *
  * 例如: 适用于有多个相同结构的表(例如多个DID，或者多个DBC)，但是你又不想使用字段来单独表示这些表，你想直接使用一个 Map 来表示这些相似的表，然后通过这些额外的数据来区分这些表，而不是字段名称和字段注解。
  *
- * @param T 泛型T，需要实现 IGridData 接口。表示该 IGridTable 接口负责管理何种类型的数据。
+ * @param T 泛型T，需要实现 IGridData 接口。表示该 IGridSpecificSheet 接口负责管理何种类型的数据。
  * */
-interface IGridTable<T : IGridRowData> {
+interface IGridSpecificSheet<T : IGridRowData> {
     /* 实现类自己需要定义自己的额外字段，以对应表格中的列标题。 */
     /** 在表格组件中的表格名称，框架会根据该变量的名称，到表格组件中去寻找对应的工作表。 */
-    val specificTable: String
+    val specificSheetName: String
     /** 持有的表格数据 */
-    val tableMap: MutableMap<String, T>
+    val gridDataMap: MutableMap<String, T>
 }
 
+interface IGridParser {
+    val workbook : Workbook
+    val sheetMap: Map<String, Sheet>
+    /** 缓存反射信息。
+     *
+     * 使用类型作为键， 使用泛型信息类的集合保存这个类的所有
+     * */
+    val bindCache : Map<KClass<*>, List<GridColumnInfo>>
+    /** 注册表格值解析器 */
+    fun registerGridValueAdapter(adapter: IGridValueAdapter)
+    fun <T : Any> parse(objectType: KClass<T>, father: IGridRowData? = null): Map<String, T>
+    fun <T : Any> parseBySheet(sheet: Sheet, objectType: KClass<T>, gridSheetType: GridSheetType, rowIndex: Ref<Int>, father: IGridRowData? = null): Map<String, T>
+}
 
 
 /** 子数据拥有者, 使用行序号保存子数据对象 */

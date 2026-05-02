@@ -25,7 +25,7 @@ fun KClass<*>.getGridInfos(filter: Boolean = true): List<GridColumnInfo> =
         // 步骤1: 创建GridBind注解(筛选注解不为空)和属性的键值对集合
         .mapNotNull { property -> property.findAnnotation<GridColumnBind>()?.let { property to it } }
         // 步骤2: 使用kotlin的函数筛选注解的 pattern 和 valueType 。(filter 为 false 时，立刻放弃筛选。)
-        .filter { (_, bind) -> !filter || bind.pattern.isNotBlank() || bind.valueType == GridValueType.OtherPage }
+        .filter { (_, bind) -> !filter || bind.pattern.isNotBlank() || bind.valueType == GridValueType.OtherSheet || bind.valueType == GridValueType.SpecificSheet  }
         // 步骤3: 筛选可变属性
         .filter { (property, _) ->
             val isMutable = property is KMutableProperty1<*, *>

@@ -10,4 +10,6 @@ enum class GridSheetType {
     Dictionary,
     /**  解析子信号 */
     SubSignal,
+    /** 子结构 */
+    SubStructure,
 }
