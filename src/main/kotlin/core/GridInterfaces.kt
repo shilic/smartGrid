@@ -43,25 +43,20 @@ interface IGridSpecificSheet<T : IGridRowData> {
     val gridDataMap: MutableMap<String, T>
 }
 
-interface IGridParser {
+interface IGridReader {
     val workbook : Workbook
     val sheetMap: Map<String, Sheet>
-    /** 缓存反射信息。
-     *
-     * 使用类型作为键， 使用泛型信息类的集合保存这个类的所有
-     * */
-    val bindCache : Map<KClass<*>, List<GridColumnInfo>>
     /** 注册表格值解析器 */
     fun registerGridValueAdapter(adapter: IGridValueAdapter)
-    fun <T : Any> parse(objectType: KClass<T>, father: IGridRowData? = null): Map<String, T>
-    fun <T : Any> parseBySheet(sheet: Sheet, objectType: KClass<T>, gridSheetType: GridSheetType, rowIndex: Ref<Int>, father: IGridRowData? = null): Map<String, T>
+    fun <T : Any> read(objectType: KClass<T>, father: IGridRowData? = null): Map<String, T>
+    fun <T : Any> readBySheet(sheet: Sheet, objectType: KClass<T>, gridSheetType: GridSheetType, rowIndex: Ref<Int>, father: IGridRowData? = null): Map<String, T>
 }
 
 
 /** 子数据拥有者, 使用行序号保存子数据对象 */
 interface SubDataOwner {
     /**  使用行序号保存子数据对象 */
-    var subObjectMap : MutableMap<Int, Any>
+    var subDataMap : MutableMap<Int, Any>
 }
 /**  指示填入表格中的数据源，哪一个是值描述， 以及值描述选项 */
 interface IValueTable {

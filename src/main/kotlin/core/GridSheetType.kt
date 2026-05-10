@@ -11,5 +11,6 @@ enum class GridSheetType {
     /**  解析子信号 */
     SubSignal,
     /** 子结构 */
+    @Deprecated("不实用，已弃用")
     SubStructure,
 }

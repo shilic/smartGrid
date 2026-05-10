@@ -22,18 +22,18 @@ class Ecu : IGridRowData {
     var ecuType: String = ""
 
     // ==================== 3. 零部件诊断ID信息 ====================
-//    @GridColumnBind("物理寻址", "物理寻址", GridValueType.HexNumber)
-//    var diagRequestId: UInt = 0u
-//    @GridColumnBind("物理响应", "物理响应", GridValueType.HexNumber)
-//    var diagResponseId: UInt = 0u
-//    @GridColumnBind("功能寻址", "功能寻址", GridValueType.HexNumber)
-//    var functionalRequestId: UInt = 0u
-//    @GridColumnBind("CAN帧类型", "CAN帧类型", GridValueType.Enum)
-//    var canFrameType: CanFrameType = CanFrameType.Default
+    @GridColumnBind("物理寻址", "物理寻址", GridValueType.HexNumber)
+    var diagRequestId: UInt = 0u
+    @GridColumnBind("物理响应", "物理响应", GridValueType.HexNumber)
+    var diagResponseId: UInt = 0u
+    @GridColumnBind("功能寻址", "功能寻址", GridValueType.HexNumber)
+    var functionalRequestId: UInt = 0u
+    @GridColumnBind("CAN帧类型", "CAN帧类型", GridValueType.Enum)
+    var canFrameType: CanFrameType = CanFrameType.Default
 
-    // 使用嵌套的解析逻辑, 解析一个简单的嵌套对象也是可以的。
-    @GridColumnBind(headerText = "物理寻址", pattern = "物理寻址", valueType = GridValueType.SubStructure)
-    var diagInfo : EcuDiagInfo = EcuDiagInfo()
+//    // 使用嵌套的解析逻辑, 解析一个简单的嵌套对象也是可以的。
+//    @GridColumnBind(headerText = "物理寻址", pattern = "物理寻址", valueType = GridValueType.SubStructure)
+//    var diagInfo : EcuDiagInfo = EcuDiagInfo()
 
     @GridColumnBind(headerText = "DTCList", valueType = GridValueType.OtherSheet)
     var dtcDefineMap : MutableMap<String, Dtc> = mutableMapOf()
@@ -42,6 +42,7 @@ class Ecu : IGridRowData {
 }
 
 @GridSheetBind(gridSheetType = GridSheetType.SubStructure)
+@Deprecated("弃用")
 class EcuDiagInfo : IGridRowData {
     @OptIn(ExperimentalStdlibApi::class)
     override val gridKey: String get() = diagRequestId.toHexString(HexFormat.UpperCase)

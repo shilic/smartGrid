@@ -11,19 +11,13 @@ import kotlin.reflect.full.*
  *
  * @param aWorkbook 传入一个工作表接口 Workbook
  */
-class GridParser(private val aWorkbook: Workbook?) : IGridParser {
+class GridReader(private val aWorkbook: Workbook?) : IGridReader {
     companion object {
-        private val LOG_TAG = GridParser::class.simpleName
+        private val LOG_TAG = GridReader::class.simpleName
     }
     override val workbook : Workbook by lazy { aWorkbook!! }
     /** 使用表名保存对应的表格 */
     override val sheetMap: Map<String, Sheet> by lazy { workbook.getSheetMap() }
-    override val bindCache : Map<KClass<*>, List<GridColumnInfo>> get() = mBindCache
-    /** 缓存反射信息。
-     *
-     * 使用类型作为键， 使用泛型信息类的集合保存这个类的所有
-     * */
-    private val mBindCache : MutableMap<KClass<*>, List<GridColumnInfo>> = mutableMapOf()
     /** 持有自定义的表格值解析器 */
     private val mCustomGridValueAdapters : MutableMap<String, IGridValueAdapter> = mutableMapOf()
 
@@ -40,7 +34,7 @@ class GridParser(private val aWorkbook: Workbook?) : IGridParser {
      * @param objectType 指定表格数据的接收类型，需要在类型定义的字段中标记绑定哪一列
      * @param father 父级元素（可选）
      */
-    override fun <T : Any> parse(objectType: KClass<T>, father: IGridRowData?): Map<String, T> {
+    override fun <T : Any> read(objectType: KClass<T>, father: IGridRowData?): Map<String, T> {
         require(objectType.isSubclassOf(IGridRowData::class)) { "类型 ${objectType.qualifiedName} 必须实现 ${IGridRowData::class.simpleName} 接口, 才可以被框架解析" }
         // 使用类型，解析注解得到表格信息，并尝试从工作表中获取对应表格
         val (sheet, sheetDataType) = checkSheet(objectType)
@@ -48,13 +42,13 @@ class GridParser(private val aWorkbook: Workbook?) : IGridParser {
         if (sheet == null) { return mutableMapOf() }
         val rowIndex = Ref(0)
         // 传入表格和类型进行解析
-        return parseBySheet(sheet, objectType, sheetDataType, rowIndex, father)
+        return readBySheet(sheet, objectType, sheetDataType, rowIndex, father)
     }
 
     /**
      * 解析一个 sheet，返回包含 sheet 数据的字典
      */
-    override  fun <T : Any> parseBySheet(sheet: Sheet, objectType: KClass<T>, gridSheetType: GridSheetType, rowIndex: Ref<Int>, father: IGridRowData?): Map<String, T> {
+    override  fun <T : Any> readBySheet(sheet: Sheet, objectType: KClass<T>, gridSheetType: GridSheetType, rowIndex: Ref<Int>, father: IGridRowData?): Map<String, T> {
         // 获取表头，输出对应的字段和表头信息
         val (titleRow, columnBindInfos) = getTitle(sheet, objectType)
         // 将对象的字段和表格中的列绑定到一起，记录对应表头的列序号。这里需要注意，虽然说是同一个反射的结果，但是在不同的表格下，填充的列下标可能是不一样的。
@@ -137,7 +131,7 @@ class GridParser(private val aWorkbook: Workbook?) : IGridParser {
                             when (bind.valueType) {
                                 GridValueType.Text, GridValueType.Number, GridValueType.HexNumber, GridValueType.ValueTable,
                                 GridValueType.Enum, GridValueType.SubSignal, GridValueType.Bool, GridValueType.Strings,
-                                GridValueType.SubStructure
+                                // GridValueType.SubStructure
                                     -> bind.valueType.parseGridCell(this, cell, sheet, bind, rowIndex, instance as IGridRowData)
                                 GridValueType.Custom -> parseCustomValue(bind.customAdapterName, cell, sheet, bind, rowIndex, instance as IGridRowData)
                                 else -> cellValue
@@ -191,7 +185,7 @@ class GridParser(private val aWorkbook: Workbook?) : IGridParser {
 
     /**  解析表头。返回表头所在的行，以及所有字段的绑定信息。*/
     private fun <T : Any> getTitle(sheet: Sheet, objectType: KClass<T>): Pair<Row, List<GridColumnInfo> > {
-        val columnBindInfos = cacheOrGetBinds(objectType)
+        val columnBindInfos = objectType.getOrCacheBinds()
 
         val keywordInfo = columnBindInfos.firstOrNull { bind -> bind.keyword }
             ?: throw ExcelException("请检查类型\"${objectType.simpleName}\"的属性上的\"${GridColumnBind::class.simpleName}\"注解, 至少有一个注解了\"${GridColumnBind::keyword.name}\" ")
@@ -215,11 +209,6 @@ class GridParser(private val aWorkbook: Workbook?) : IGridParser {
         return requireNotNull(titleRow) {
             "表格 ${sheet.sheetName} 中没有找到表头，请检查表格是否有第一个查询项 '${keywordInfo.headerText}'"
         } to columnBindInfos
-    }
-
-    /** 从缓存中获取反射信息，或者重新使用反射获取 */
-    private fun  <T : Any> cacheOrGetBinds(objectType: KClass<T>) : List<GridColumnInfo> {
-        return mBindCache.getOrPut(objectType) { objectType.getGridInfos() }
     }
 
     /**  获取绑定列索引  */

@@ -11,9 +11,15 @@ import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.javaField
 
-/** 动态字典，支持在运行时确定键值类型 */
-fun <K : Any, V : Any> createTypedMap(keyType: KClass<K>, valueType: KClass<V>): MutableMap<K, V> {
-    return LinkedHashMap<K, V>()
+/** 缓存反射信息。
+ *
+ * 使用类型作为键， 使用泛型信息类的集合保存这个类的所有
+ * */
+private val mBindCache : MutableMap<KClass<*>, List<GridColumnInfo>> = mutableMapOf()
+
+/** 从缓存中获取反射信息，或者重新使用反射获取 */
+fun KClass<*>.getOrCacheBinds() : List<GridColumnInfo> {
+    return mBindCache.getOrPut(this) { this.getGridInfos() }
 }
 /**
  * 使用反射, 从类型上的所有属性获取绑定的 GridInfo 信息。你可能需要缓存反射的结果。
