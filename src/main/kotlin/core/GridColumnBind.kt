@@ -54,9 +54,6 @@ class GridColumnInfo private constructor (
     val gridColumnBind: GridColumnBind,
     /** kMutableProperty : 注解的持有者(某个可变属性)。 该注解和哪一个属性绑定 */
     val kMutableProperty: KMutableProperty1<*,*>,
-    /** 如果该字段是一个子数据的键值对，还需要记录子数据的列序号和扩展信息键值对 TODO */
-    @Deprecated("暂时没有使用场景，之后再来使用")
-    val subGridInfo: MutableList<GridColumnInfo> = mutableListOf(),
     /** cacheKey : 该注解的键 */
     val cacheKey : String,
 ) : IGridKey
