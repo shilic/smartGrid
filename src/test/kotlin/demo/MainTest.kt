@@ -1,7 +1,7 @@
 package demo
 
-import core.GridReader
-import core.poiWorkbook
+import io.github.shilic.smartGrid.core.GridReader
+import io.github.shilic.smartGrid.core.poiWorkbook
 import demo.dataModel.dbcDataModel.CanProtocol
 import demo.dataModel.udsDataModel.Ecu
 import demo.utils.toGsonString

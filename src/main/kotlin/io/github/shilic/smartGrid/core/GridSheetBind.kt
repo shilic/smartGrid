@@ -1,4 +1,4 @@
-package core
+package io.github.shilic.smartGrid.core
 
 /**
  * 在类上标记该类对应哪一个表格。

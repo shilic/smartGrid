@@ -1,7 +1,7 @@
 package demo.dataModel.udsDataModel.did
 
-import core.GridSheetBind
-import core.GridSheetType
+import io.github.shilic.smartGrid.core.GridSheetBind
+import io.github.shilic.smartGrid.core.GridSheetType
 
 /**
  * 动态 (只读) DID

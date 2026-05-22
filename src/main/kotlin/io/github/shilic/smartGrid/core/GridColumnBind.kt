@@ -1,4 +1,4 @@
-package core
+package io.github.shilic.smartGrid.core
 
 import java.lang.ref.WeakReference
 import kotlin.reflect.KMutableProperty1

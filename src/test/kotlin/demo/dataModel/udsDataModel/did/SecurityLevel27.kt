@@ -1,6 +1,6 @@
 package demo.dataModel.udsDataModel.did
 
-import core.GridColumnBind
+import io.github.shilic.smartGrid.core.GridColumnBind
 
 /**
  * 27安全等级 - 使用枚举类

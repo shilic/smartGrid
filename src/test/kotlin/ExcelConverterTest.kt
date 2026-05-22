@@ -1,10 +1,10 @@
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import utils.ExcelConverter.toBase26
-import utils.ExcelConverter.toDecimalNumber
-import utils.base26
-import utils.exCell
+import io.github.shilic.smartGrid.utils.ExcelConverter.toBase26
+import io.github.shilic.smartGrid.utils.ExcelConverter.toDecimalNumber
+import io.github.shilic.smartGrid.utils.base26
+import io.github.shilic.smartGrid.utils.exCell
 
 /**
  * 单元测试示例

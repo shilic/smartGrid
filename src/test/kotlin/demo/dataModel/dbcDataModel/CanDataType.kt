@@ -1,6 +1,6 @@
 package demo.dataModel.dbcDataModel
 
-import core.GridColumnBind
+import io.github.shilic.smartGrid.core.GridColumnBind
 
 enum class CanDataType {
     @GridColumnBind(headerText = "Unsigned", pattern = "Hex|hex|HEX|无符号|((Hex|hex|HEX)?\\s*[(（]?\\s*(Unsigned|unsigned|UNSIGNED)\\s*[)）]?)")

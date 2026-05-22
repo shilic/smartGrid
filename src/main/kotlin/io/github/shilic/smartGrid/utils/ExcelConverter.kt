@@ -1,7 +1,8 @@
-package utils
+package io.github.shilic.smartGrid.utils
 
 import org.apache.poi.ss.usermodel.Cell
 import kotlin.math.pow
+import kotlin.text.get
 
 /**
  * Excel 转换器，将数值类型转换为 26 进制字符串;

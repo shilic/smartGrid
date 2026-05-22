@@ -1,9 +1,9 @@
-package utils
+package io.github.shilic.smartGrid.utils
 
-import core.GridColumnBind
-import core.GridColumnInfo
-import core.GridValueType
-import core.bindTo
+import io.github.shilic.smartGrid.core.GridColumnBind
+import io.github.shilic.smartGrid.core.GridColumnInfo
+import io.github.shilic.smartGrid.core.GridValueType
+import io.github.shilic.smartGrid.core.bindTo
 import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.KProperty1

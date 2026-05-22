@@ -1,7 +1,7 @@
 package demo.dataModel.dbcDataModel
 
-import core.*
 import demo.dataModel.udsDataModel.did.CanByteOrder
+import io.github.shilic.smartGrid.core.*
 
 /**  用于描述单个信号 */
 @GridSheetBind(gridSheetType = GridSheetType.SubSignal)

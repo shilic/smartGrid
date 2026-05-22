@@ -1,4 +1,4 @@
-package utils
+package io.github.shilic.smartGrid.utils
 
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1

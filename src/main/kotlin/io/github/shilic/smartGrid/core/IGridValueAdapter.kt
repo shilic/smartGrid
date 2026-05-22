@@ -1,4 +1,4 @@
-package core
+package io.github.shilic.smartGrid.core
 
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Sheet

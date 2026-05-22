@@ -1,4 +1,4 @@
-package core
+package io.github.shilic.smartGrid.core
 
 /**
  * 表格数据类型, 例如一张表只表示一个数据; 或者一张表表示多个数据, 一行则代表一个。又或者表示子数据。

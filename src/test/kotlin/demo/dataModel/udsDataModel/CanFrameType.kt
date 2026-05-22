@@ -1,6 +1,6 @@
 package demo.dataModel.udsDataModel
 
-import core.GridColumnBind
+import io.github.shilic.smartGrid.core.GridColumnBind
 
 enum class CanFrameType(val value: Byte) {
     @GridColumnBind("标准帧", "Standard|standard|stand|Stand|标准帧")

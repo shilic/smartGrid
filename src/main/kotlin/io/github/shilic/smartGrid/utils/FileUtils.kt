@@ -1,4 +1,4 @@
-package utils
+package io.github.shilic.smartGrid.utils
 
 import java.io.File
 import java.nio.file.Files

@@ -1,7 +1,11 @@
 package demo.dataModel.udsDataModel
 
-import core.*
 import demo.dataModel.udsDataModel.did.EOLDid
+import io.github.shilic.smartGrid.core.GridColumnBind
+import io.github.shilic.smartGrid.core.GridSheetBind
+import io.github.shilic.smartGrid.core.GridSheetType
+import io.github.shilic.smartGrid.core.GridValueType
+import io.github.shilic.smartGrid.core.IGridRowData
 
 @GridSheetBind(sheetName = "Ecu Info",  pattern = "零部件信息|((Ecu|ecu|ECU)\\\\s*(Info|info|INFO))", gridSheetType = GridSheetType.Single)
 class Ecu : IGridRowData {

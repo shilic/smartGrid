@@ -1,4 +1,4 @@
-package core
+package io.github.shilic.smartGrid.core
 
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
@@ -6,7 +6,7 @@ import kotlin.reflect.KClass
 
 /** 一个接口，要求实现类必须给出一个字符串格式的唯一识别键，在生成字典的时候作为该实现类的字典的键 */
 interface IGridKey {
-    /** 一个接口，要求实现类必须给出一个字符串格式的唯一识别键，在生成字典的时候作为该实现类的字典的键 */
+    /** 表格数据的关键字。在生成字典的时候作为该实现类的字典的键。 */
     val gridKey : String
 }
 /**  表格数据的子数据接口，用于指明该子数据的父级元素 */

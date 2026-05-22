@@ -1,7 +1,6 @@
 package demo.dataModel.udsDataModel.did
 
-import core.GridColumnBind
-import core.GridValueType
+import io.github.shilic.smartGrid.core.GridColumnBind
 
 /**
  * 存储位置 - 使用枚举类
