@@ -22,22 +22,22 @@ class DidSignal: IGridRowData {
     @GridColumnBind(headerText = "子数据描述", pattern = "子数据描述", valueType = GridValueType.Text)
     var signalDescription: String = ""
 
-    @GridColumnBind(headerText = "子数据起始位", pattern = "子数据起始位", valueType = GridValueType.Number, uiIgnore = true)
+    @GridColumnBind(headerText = "子数据起始位", pattern = "子数据起始位", valueType = GridValueType.NumberType, uiIgnore = true)
     var startBit: Int = 0
 
-    @GridColumnBind(headerText = "子数据长度", pattern = "子数据长度", valueType = GridValueType.Number, uiIgnore = true)
+    @GridColumnBind(headerText = "子数据长度", pattern = "子数据长度", valueType = GridValueType.NumberType, uiIgnore = true)
     var bitLength: Int = 0
 
-    @GridColumnBind(headerText = "子数据排列格式", pattern = "排列格式", valueType = GridValueType.Enum, uiIgnore = true)
+    @GridColumnBind(headerText = "子数据排列格式", pattern = "排列格式", valueType = GridValueType.Enumeration, uiIgnore = true)
     var byteOrder: CanByteOrder = CanByteOrder.INTEL
 
-    @GridColumnBind(headerText = "子数据编码格式", pattern = "编码格式", valueType = GridValueType.Enum, uiIgnore = true)
+    @GridColumnBind(headerText = "子数据编码格式", pattern = "编码格式", valueType = GridValueType.Enumeration, uiIgnore = true)
     var didCodeFormat: DIDCodeFormat = DIDCodeFormat.UNSIGNED
 
-    @GridColumnBind(headerText = "子数据精度", pattern = "精度", valueType = GridValueType.Number, uiIgnore = true)
+    @GridColumnBind(headerText = "子数据精度", pattern = "精度", valueType = GridValueType.NumberType, uiIgnore = true)
     var factor: Double = 1.0
 
-    @GridColumnBind(headerText = "子数据偏移量", pattern = "偏移量", valueType = GridValueType.Number, uiIgnore = true)
+    @GridColumnBind(headerText = "子数据偏移量", pattern = "偏移量", valueType = GridValueType.NumberType, uiIgnore = true)
     var offset: Double = 0.0
 
     // 可选参数

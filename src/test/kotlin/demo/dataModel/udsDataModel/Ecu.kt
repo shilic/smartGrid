@@ -32,7 +32,7 @@ class Ecu : IGridRowData {
     var diagResponseId: UInt = 0u
     @GridColumnBind("功能寻址", "功能寻址", GridValueType.HexNumber)
     var functionalRequestId: UInt = 0u
-    @GridColumnBind("CAN帧类型", "CAN帧类型", GridValueType.Enum)
+    @GridColumnBind("CAN帧类型", "CAN帧类型", GridValueType.Enumeration)
     var canFrameType: CanFrameType = CanFrameType.Default
 
 //    // 使用嵌套的解析逻辑, 解析一个简单的嵌套对象也是可以的。
@@ -58,6 +58,6 @@ class EcuDiagInfo : IGridRowData {
     var diagResponseId: UInt = 0u
     @GridColumnBind(headerText = "功能寻址", pattern = "功能寻址", valueType =  GridValueType.HexNumber)
     var functionalRequestId: UInt = 0u
-    @GridColumnBind(headerText = "CAN帧类型", pattern = "CAN帧类型", valueType = GridValueType.Enum)
+    @GridColumnBind(headerText = "CAN帧类型", pattern = "CAN帧类型", valueType = GridValueType.Enumeration)
     var canFrameType: CanFrameType = CanFrameType.Default
 }

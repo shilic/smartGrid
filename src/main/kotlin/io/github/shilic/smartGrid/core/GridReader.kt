@@ -137,8 +137,8 @@ class GridReader(private val aWorkbook: Workbook?) : IGridReader {
 
                             val cellValue = cell.stringValue.trim()
                             when (bind.valueType) {
-                                GridValueType.Text, GridValueType.Number, GridValueType.HexNumber, GridValueType.ValueTable,
-                                GridValueType.Enum, GridValueType.SubSignal, GridValueType.Bool, GridValueType.Strings,
+                                GridValueType.Text, GridValueType.NumberType, GridValueType.HexNumber, GridValueType.ValueTable,
+                                GridValueType.Enumeration, GridValueType.SubSignal, GridValueType.BoolType, GridValueType.Strings,
                                 // GridValueType.SubStructure
                                     -> bind.valueType.parseGridCell(this, cell, sheet, bind, rowIndex, instance as IGridRowData)
                                 GridValueType.Custom -> parseCustomValue(bind.customAdapterName, cell, sheet, bind, rowIndex, instance as IGridRowData)

@@ -33,7 +33,7 @@ enum class GridValueType(
         }
     },
     /** 普通数值类型(十进制)。最终会被识别成 Double 或者 Float */
-    Number(1, "普通数值类型(十进制)") {
+    NumberType(1, "普通数值类型(十进制)") {
         override fun parseGridCell(gridParser:IGridReader, cell: Cell?, sheet: Sheet, bind : GridColumnInfo, rowIndex: Ref<Int>, father: IGridRowData): Any {
             val kClass = bind.kMutableProperty.returnType.classifier as KClass<*>
             val cellValue = cell!!.stringValue.trim()
@@ -140,7 +140,7 @@ enum class GridValueType(
         }
     },
     /**  按照枚举来解析。拿到枚举字段后，会获取该枚举类型的所有枚举项，并获取上边的注解， 再拿到正则表达式，进行单元格识别。 */
-    Enum(4, "枚举") {
+    Enumeration(4, "枚举") {
         override fun parseGridCell(gridParser:IGridReader, cell: Cell?, sheet: Sheet, bind : GridColumnInfo, rowIndex: Ref<Int>, father: IGridRowData): Any {
             val cellValue = cell!!.stringValue.trim()
             val kClass = bind.kMutableProperty.returnType.classifier as KClass<*>
@@ -198,7 +198,7 @@ enum class GridValueType(
         }
     },
     /**  布尔类型; 通常值的类型为 true 和 false 。 */
-    Bool(7, "布尔") {
+    BoolType(7, "布尔") {
         override fun parseGridCell(gridParser:IGridReader, cell: Cell?, sheet: Sheet, bind : GridColumnInfo, rowIndex: Ref<Int>, father: IGridRowData): Any {
             val cellValue = cell!!.stringValue.trim()
             return Regex("Y|y|true|True|TRUE").matches(cellValue.trim())
@@ -213,8 +213,10 @@ enum class GridValueType(
 
             return when {
                 kClass.isSubclassOf(Array::class) -> strings.toTypedArray()
-                kClass.isSubclassOf(List::class) -> strings.toList()
-                kClass.isSubclassOf(Set::class) -> strings.toSet()
+                kClass.isSubclassOf(MutableList::class) -> strings.toMutableList()
+                kClass.isSubclassOf(MutableSet::class) -> strings.toMutableSet()
+                kClass.isSubclassOf(List::class) ->  strings.toMutableList()
+                kClass.isSubclassOf(Set::class) -> strings.toMutableSet()
                 else -> strings
             }
         }

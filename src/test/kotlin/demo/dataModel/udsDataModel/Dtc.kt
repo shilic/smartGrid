@@ -75,7 +75,7 @@ class Dtc  : IGridRowData {
      * 从 16 进制值的高两位解析
      */
     @delegate:Transient
-    @GridColumnBind(headerText = "故障属性", valueType = GridValueType.Enum)
+    @GridColumnBind(headerText = "故障属性", valueType = GridValueType.Enumeration)
     val dtcSystemType: DtcSystemType by lazy { parseDtcHexToSystemType(dtcHexNumber) }
 
     // --------------------- 公共方法 -----------------------

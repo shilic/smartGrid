@@ -23,39 +23,39 @@ class CanSignal: IGridRowData {
     var signalComment: String = ""
 
     /** 排列格式，Intel 或者 Motorola。排列方式默认为英特尔模式 Intel */
-    @GridColumnBind(headerText = "ByteOrder", pattern = "ByteOrder", valueType = GridValueType.Enum)
+    @GridColumnBind(headerText = "ByteOrder", pattern = "ByteOrder", valueType = GridValueType.Enumeration)
     var byteOrder: CanByteOrder = CanByteOrder.INTEL
 
     /** 起始位 bit；注意，当数据排列格式为motorola时，存入其中的起始位只能是 MSB 的位置 */
-    @GridColumnBind(headerText = "StartBit", pattern = "StartBit", valueType = GridValueType.Number)
+    @GridColumnBind(headerText = "StartBit", pattern = "StartBit", valueType = GridValueType.NumberType)
     var startBit: Int = 0
 
     /** 信号长度 BitLength(Bit) 会用于最大值最小值的计算 */
-    @GridColumnBind(headerText = "BitLength", pattern = "BitLength", valueType = GridValueType.Number)
+    @GridColumnBind(headerText = "BitLength", pattern = "BitLength", valueType = GridValueType.NumberType)
     var bitLength: Int = 0
 
     /** CAN数据类型,无符号和有符号，默认无符号 */
-    @GridColumnBind(headerText = "DataType", pattern = "DataType", valueType = GridValueType.Enum)
+    @GridColumnBind(headerText = "DataType", pattern = "DataType", valueType = GridValueType.Enumeration)
     var dataType: CanDataType = CanDataType.UNSIGNED
 
     /** 精度(精度不可以为0，否则无意义) ; 物理值 = 原始值 * factor + offset */
-    @GridColumnBind(headerText = "Factor", pattern = "Factor", valueType = GridValueType.Number)
+    @GridColumnBind(headerText = "Factor", pattern = "Factor", valueType = GridValueType.NumberType)
     var factor: Double = 0.0
 
     /** 偏移量 (通常为负数) ； 物理值 = 原始值 * factor + offset */
-    @GridColumnBind(headerText = "Offset", pattern = "Offset", valueType = GridValueType.Number)
+    @GridColumnBind(headerText = "Offset", pattern = "Offset", valueType = GridValueType.NumberType)
     var offset: Double = 0.0
 
     /** 物理最小值 */
-    @GridColumnBind(headerText = "SignalMinValuePhys", pattern = "SignalMinValuePhys", valueType = GridValueType.Number)
+    @GridColumnBind(headerText = "SignalMinValuePhys", pattern = "SignalMinValuePhys", valueType = GridValueType.NumberType)
     var minValuePhys: Double = 0.0
 
     /** 物理最大值 */
-    @GridColumnBind(headerText = "SignalMaxValuePhys", pattern = "SignalMaxValuePhys", valueType = GridValueType.Number)
+    @GridColumnBind(headerText = "SignalMaxValuePhys", pattern = "SignalMaxValuePhys", valueType = GridValueType.NumberType)
     var maxValuePhys: Double = 0.0
 
     /** 物理初始值 */
-    @GridColumnBind(headerText = "InitialValuePhys", pattern = "InitialValuePhys", valueType = GridValueType.Number)
+    @GridColumnBind(headerText = "InitialValuePhys", pattern = "InitialValuePhys", valueType = GridValueType.NumberType)
     var initialValuePhys: Double = 0.0
 
     //@GridColumnBind(headerText = "", pattern = "", valueType = GridValueType.Enum)

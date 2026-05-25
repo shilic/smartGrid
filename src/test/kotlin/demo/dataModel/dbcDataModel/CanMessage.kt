@@ -31,11 +31,11 @@ class CanMessage : IGridRowData {
 //    var msgSendType: MsgSendType = MsgSendType.Cycle
 
     /** 报文周期时间 毫秒 */
-    @GridColumnBind(headerText = "报文周期时间", pattern = "报文周期时间", valueType = GridValueType.Number)
+    @GridColumnBind(headerText = "报文周期时间", pattern = "报文周期时间", valueType = GridValueType.NumberType)
     var msgCycleTime: Int = 0
 
     /** 报文长度 单位: byte */
-    @GridColumnBind(headerText = "报文长度", pattern = "报文长度", valueType = GridValueType.Number)
+    @GridColumnBind(headerText = "报文长度", pattern = "报文长度", valueType = GridValueType.NumberType)
     var msgLength: Byte = 0
 
     /** 报文注释 */

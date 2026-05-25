@@ -22,19 +22,19 @@ open class Did: IGridRowData {
     @GridColumnBind(headerText = "DID描述", pattern = "DID描述", valueType = GridValueType.Text)
     var didDescription: String = ""
 
-    @GridColumnBind(headerText = "字节长度", pattern = "字节长度", valueType = GridValueType.Number, uiIgnore = true)
+    @GridColumnBind(headerText = "字节长度", pattern = "字节长度", valueType = GridValueType.NumberType, uiIgnore = true)
     var sizeBytes: Int = 0
 
-    @GridColumnBind(headerText = "排列格式", pattern = "排列格式", valueType = GridValueType.Enum, uiIgnore = true)
+    @GridColumnBind(headerText = "排列格式", pattern = "排列格式", valueType = GridValueType.Enumeration, uiIgnore = true)
     var byteOrder: CanByteOrder = CanByteOrder.INTEL
 
-    @GridColumnBind(headerText = "编码格式", pattern = "编码格式", valueType = GridValueType.Enum, uiIgnore = true)
+    @GridColumnBind(headerText = "编码格式", pattern = "编码格式", valueType = GridValueType.Enumeration, uiIgnore = true)
     var didCodeFormat: DIDCodeFormat = DIDCodeFormat.UNSIGNED
 
-    @GridColumnBind(headerText = "DID精度", pattern = "精度", valueType = GridValueType.Number, uiIgnore = true)
+    @GridColumnBind(headerText = "DID精度", pattern = "精度", valueType = GridValueType.NumberType, uiIgnore = true)
     var factor: Double = 1.0
 
-    @GridColumnBind(headerText = "DID偏移量", pattern = "偏移量", valueType = GridValueType.Number, uiIgnore = true)
+    @GridColumnBind(headerText = "DID偏移量", pattern = "偏移量", valueType = GridValueType.NumberType, uiIgnore = true)
     var offset: Double = 0.0
 
     // 可选参数
@@ -45,29 +45,29 @@ open class Did: IGridRowData {
     @GridColumnBind(headerText = "值描述(读取)", pattern = "值描述", valueType = GridValueType.ValueTable, uiIgnore = true)
     var valueTable: MutableMap<Int, String> = mutableMapOf()
 
-    @GridColumnBind(headerText = "存储位置", pattern = "存储位置", valueType = GridValueType.Enum, uiIgnore = true)
+    @GridColumnBind(headerText = "存储位置", pattern = "存储位置", valueType = GridValueType.Enumeration, uiIgnore = true)
     var storagePosition: DidStoragePosition = DidStoragePosition.TBD
 
-    @GridColumnBind(headerText = "访问权限", pattern = "访问权限", valueType = GridValueType.Enum)
+    @GridColumnBind(headerText = "访问权限", pattern = "访问权限", valueType = GridValueType.Enumeration)
     var didAccessPermission: DIDAccessPermission = DIDAccessPermission.READ_AND_WRITE
 
-    @GridColumnBind(headerText = "27安全等级", pattern = "27安全等级", valueType = GridValueType.Enum, uiIgnore = true)
+    @GridColumnBind(headerText = "27安全等级", pattern = "27安全等级", valueType = GridValueType.Enumeration, uiIgnore = true)
     var securityLevel: SecurityLevel27 = SecurityLevel27.LEVEL1
 
     // 会话权限
-    @GridColumnBind(headerText = "Level1默认会话", pattern = "Level1默认会话", valueType = GridValueType.Enum, uiIgnore = true)
+    @GridColumnBind(headerText = "Level1默认会话", pattern = "Level1默认会话", valueType = GridValueType.Enumeration, uiIgnore = true)
     var defaultSessionLevel1: DIDAccessPermission = DIDAccessPermission.READ_AND_WRITE
 
-    @GridColumnBind(headerText = "Level1扩展会话", pattern = "Level1扩展会话", valueType = GridValueType.Enum, uiIgnore = true)
+    @GridColumnBind(headerText = "Level1扩展会话", pattern = "Level1扩展会话", valueType = GridValueType.Enumeration, uiIgnore = true)
     var extendSessionLevel1: DIDAccessPermission = DIDAccessPermission.READ_AND_WRITE
 
-    @GridColumnBind(headerText = "Level2默认会话", pattern = "Level2默认会话", valueType = GridValueType.Enum, uiIgnore = true)
+    @GridColumnBind(headerText = "Level2默认会话", pattern = "Level2默认会话", valueType = GridValueType.Enumeration, uiIgnore = true)
     var defaultSessionLevel2: DIDAccessPermission = DIDAccessPermission.READ_AND_WRITE
 
-    @GridColumnBind(headerText = "Level2编程会话", pattern = "Level2编程会话", valueType = GridValueType.Enum, uiIgnore = true)
+    @GridColumnBind(headerText = "Level2编程会话", pattern = "Level2编程会话", valueType = GridValueType.Enumeration, uiIgnore = true)
     var programSessionLevel2: DIDAccessPermission = DIDAccessPermission.READ_AND_WRITE
 
-    @GridColumnBind(headerText = "Level2扩展会话", pattern = "Level2扩展会话", valueType = GridValueType.Enum, uiIgnore = true)
+    @GridColumnBind(headerText = "Level2扩展会话", pattern = "Level2扩展会话", valueType = GridValueType.Enumeration, uiIgnore = true)
     var extendSessionLevel2: DIDAccessPermission = DIDAccessPermission.READ_AND_WRITE
 
     // 子数据
