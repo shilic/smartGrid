@@ -5,7 +5,7 @@ import io.github.shilic.smartGrid.core.*
 
 /**  用于描述单个信号 */
 @GridSheetBind(gridSheetType = GridSheetType.SubSignal)
-class CanSignal: IGridRowData {
+class CanSignal: IMutableGridRowData {
     // IGridRowData 接口实现
     override val gridKey: String get() = signalName
     override var gridFather: String = ""

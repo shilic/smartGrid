@@ -6,7 +6,7 @@ import io.github.shilic.smartGrid.core.*
  * 自定义属性 (允许子类继承)
  * */
 @GridSheetBind(sheetName = "AttributeDefinition", pattern = "AttributeDefinition", gridSheetType = GridSheetType.Dictionary)
-open class AttributeDefinition: IGridRowData {
+open class AttributeDefinition: IMutableGridRowData {
     // IGridRowData 接口实现
     override val gridKey: String get() = attributeName
     override var gridFather: String = ""

@@ -4,13 +4,13 @@ import io.github.shilic.smartGrid.core.GridColumnBind
 import io.github.shilic.smartGrid.core.GridSheetBind
 import io.github.shilic.smartGrid.core.GridSheetType
 import io.github.shilic.smartGrid.core.GridValueType
-import io.github.shilic.smartGrid.core.IGridRowData
+import io.github.shilic.smartGrid.core.IMutableGridRowData
 
 /**
  * 用于描述消息 Message
  */
 @GridSheetBind(gridSheetType = GridSheetType.Dictionary)
-class CanMessage : IGridRowData {
+class CanMessage : IMutableGridRowData {
     // IGridRowData 接口实现
     override val gridKey: String get() = "0x${msgId.toString(16).uppercase().padStart(8, '0')}"
     override var gridFather: String = ""

@@ -21,20 +21,20 @@ enum class GridValueType(
 ) : IGridValueAdapter {
     /** 未定义，表示初始值，需要向上层报错, 或者忽略该值。 */
     NotDefined(-1, "未定义") {
-        override fun parseGridCell(gridParser:IGridReader, cell: Cell?, sheet: Sheet, bind : GridColumnInfo, rowIndex: Ref<Int>, father: IGridRowData): Any {
+        override fun parseGridCell(gridParser:IGridReader, cell: Cell?, sheet: Sheet, bind : GridColumnInfo, rowIndex: Ref<Int>, father: IMutableGridRowData): Any {
             throw NotImplementedError("${NotDefined.description}: 类型:\"${father::class.simpleName}\"上的属性:\"${bind.kMutableProperty}\"中的注解\"${GridColumnBind::class.simpleName}\"" +
                     "未定义${GridValueType::class.simpleName}属性，无法确定以什么方式解析该属性。请在该注解上定义${GridValueType::class.simpleName}")
         }
     },
     /**  文本格式。按照普通字符串格式解析; 通常是 String 类型 */
     Text(0, "文本格式") {
-        override fun parseGridCell(gridParser:IGridReader, cell: Cell?, sheet: Sheet, bind : GridColumnInfo, rowIndex: Ref<Int>, father: IGridRowData): Any {
+        override fun parseGridCell(gridParser:IGridReader, cell: Cell?, sheet: Sheet, bind : GridColumnInfo, rowIndex: Ref<Int>, father: IMutableGridRowData): Any {
             return cell!!.stringValue.trim()
         }
     },
     /** 普通数值类型(十进制)。最终会被识别成 Double 或者 Float */
     NumberType(1, "普通数值类型(十进制)") {
-        override fun parseGridCell(gridParser:IGridReader, cell: Cell?, sheet: Sheet, bind : GridColumnInfo, rowIndex: Ref<Int>, father: IGridRowData): Any {
+        override fun parseGridCell(gridParser:IGridReader, cell: Cell?, sheet: Sheet, bind : GridColumnInfo, rowIndex: Ref<Int>, father: IMutableGridRowData): Any {
             val kClass = bind.kMutableProperty.returnType.classifier as KClass<*>
             val cellValue = cell!!.stringValue.trim()
             return when {
@@ -65,7 +65,7 @@ enum class GridValueType(
     },
     /**  按照16进制字符串解析成整形数。 通常是  UInt 或者 UShort 类型 */
     HexNumber(2, "16进制字符串") {
-        override fun parseGridCell(gridParser:IGridReader, cell: Cell?, sheet: Sheet, bind : GridColumnInfo, rowIndex: Ref<Int>, father: IGridRowData): Any {
+        override fun parseGridCell(gridParser:IGridReader, cell: Cell?, sheet: Sheet, bind : GridColumnInfo, rowIndex: Ref<Int>, father: IMutableGridRowData): Any {
             val kClass = bind.kMutableProperty.returnType.classifier as KClass<*>
             val cellValue = cell!!.stringValue.trim()
             val value : ULong = cellValue.trim().lowercase().replace("0x", "").toULongOrNull(16) ?: throw ExcelException("单元格格式错误，无法解析 $cellValue 为 16 进制字符串")
@@ -88,7 +88,7 @@ enum class GridValueType(
     /** 值描述。字段类型是 Dictionary (int ,string) 的字段就是值描述，按需标注该注解。
      *  通常用于描述这个值的解析规则。 */
     ValueTable(3, "值描述") {
-        override fun parseGridCell(gridParser:IGridReader, cell: Cell?, sheet: Sheet, bind : GridColumnInfo, rowIndex: Ref<Int>, father: IGridRowData): Any {
+        override fun parseGridCell(gridParser:IGridReader, cell: Cell?, sheet: Sheet, bind : GridColumnInfo, rowIndex: Ref<Int>, father: IMutableGridRowData): Any {
             val cellValue = cell!!.stringValue.trim()
             return parseValueTable(cellValue)
         }
@@ -141,7 +141,7 @@ enum class GridValueType(
     },
     /**  按照枚举来解析。拿到枚举字段后，会获取该枚举类型的所有枚举项，并获取上边的注解， 再拿到正则表达式，进行单元格识别。 */
     Enumeration(4, "枚举") {
-        override fun parseGridCell(gridParser:IGridReader, cell: Cell?, sheet: Sheet, bind : GridColumnInfo, rowIndex: Ref<Int>, father: IGridRowData): Any {
+        override fun parseGridCell(gridParser:IGridReader, cell: Cell?, sheet: Sheet, bind : GridColumnInfo, rowIndex: Ref<Int>, father: IMutableGridRowData): Any {
             val cellValue = cell!!.stringValue.trim()
             val kClass = bind.kMutableProperty.returnType.classifier as KClass<*>
             require(kClass.java.isEnum) {"类型错误，${GridColumnBind::class.simpleName}注解标注的是枚举类型，实际上的类型却是 ${kClass.simpleName}" }
@@ -174,10 +174,10 @@ enum class GridValueType(
          * 5. 同时，将解析到的值返回给外部。并记录最后一行下标。
          * 6. 注意，有无子数据都会嵌套进入子数据识别的逻辑。只是说，如果没有子数据，则会返回没有元素的空集合。
          */
-        override fun parseGridCell(gridParser:IGridReader, cell: Cell?, sheet: Sheet, bind : GridColumnInfo, rowIndex: Ref<Int>, father: IGridRowData): Any {
+        override fun parseGridCell(gridParser:IGridReader, cell: Cell?, sheet: Sheet, bind : GridColumnInfo, rowIndex: Ref<Int>, father: IMutableGridRowData): Any {
             // 获取字典类型的值的类型 valueType ，作为下一个函数的输入
             val (_, valueClass)  = bind.kMutableProperty.getDictionaryKeyValueTypes()
-            require(valueClass.isSubclassOf(IGridRowData::class)) { "类:\"${father::class.simpleName}\"的属性:\"${bind.kMutableProperty.name}\"中, 字典嵌套的值的类型也必须实现\"${IGridRowData::class.simpleName}\"接口 " }
+            require(valueClass.isSubclassOf(IMutableGridRowData::class)) { "类:\"${father::class.simpleName}\"的属性:\"${bind.kMutableProperty.name}\"中, 字典嵌套的值的类型也必须实现\"${IMutableGridRowData::class.simpleName}\"接口 " }
             // 强制指定是 SheetDataType.SubSignal 类型。
             val gridSheetType = GridSheetType.SubSignal
             // 这里需要手动将下标移动到下一行。特别注意，在退出条件里，需要将下标 -1 以 回到上一行。
@@ -189,24 +189,24 @@ enum class GridValueType(
     },
     /**  子页面。表示这个数据是在另外一个表格定义的，需要到该字段的定义中寻找信息来解析。  */
     OtherSheet(6, "子页面") {
-        override fun parseGridCell(gridParser:IGridReader, cell: Cell?, sheet: Sheet, bind : GridColumnInfo, rowIndex: Ref<Int>, father: IGridRowData): Any {
+        override fun parseGridCell(gridParser:IGridReader, cell: Cell?, sheet: Sheet, bind : GridColumnInfo, rowIndex: Ref<Int>, father: IMutableGridRowData): Any {
             // 传入字段的类型，理论上是 如 public Dictionary<string, EOLDid> ; 获取字典类型的值的类型 valueType ，作为下一个函数的输入
             val  (_, valueClass)  = bind.kMutableProperty.getDictionaryKeyValueTypes()
-            require(valueClass.isSubclassOf(IGridRowData::class)) { "类:\"${father::class.simpleName}\"的属性:\"${bind.kMutableProperty.name}\"中, 字典嵌套的值的类型也必须实现\"${IGridRowData::class.simpleName}\"接口 " }
+            require(valueClass.isSubclassOf(IMutableGridRowData::class)) { "类:\"${father::class.simpleName}\"的属性:\"${bind.kMutableProperty.name}\"中, 字典嵌套的值的类型也必须实现\"${IMutableGridRowData::class.simpleName}\"接口 " }
             // 再将值的类型传入，进行嵌套调用
             return gridParser.read(valueClass, father)
         }
     },
     /**  布尔类型; 通常值的类型为 true 和 false 。 */
     BoolType(7, "布尔") {
-        override fun parseGridCell(gridParser:IGridReader, cell: Cell?, sheet: Sheet, bind : GridColumnInfo, rowIndex: Ref<Int>, father: IGridRowData): Any {
+        override fun parseGridCell(gridParser:IGridReader, cell: Cell?, sheet: Sheet, bind : GridColumnInfo, rowIndex: Ref<Int>, father: IMutableGridRowData): Any {
             val cellValue = cell!!.stringValue.trim()
             return Regex("Y|y|true|True|TRUE").matches(cellValue.trim())
         }
     },
     /**  文本集合。 字符串数组、字符串List集合 或者 字符串Set集合。 使用逗号分割每一个数据元素。  */
     Strings(8, "文本集合") {
-        override fun parseGridCell(gridParser:IGridReader, cell: Cell?, sheet: Sheet, bind : GridColumnInfo, rowIndex: Ref<Int>, father: IGridRowData): Any {
+        override fun parseGridCell(gridParser:IGridReader, cell: Cell?, sheet: Sheet, bind : GridColumnInfo, rowIndex: Ref<Int>, father: IMutableGridRowData): Any {
             val cellValue = cell!!.stringValue.trim()
             val kClass = bind.kMutableProperty.returnType.classifier as KClass<*>
             val strings : List<String> = cellValue.split(',', '，', '、', ';', '；').map { it.trim() }
@@ -225,9 +225,9 @@ enum class GridValueType(
     @Deprecated("不实用，决定弃用")
     SubStructure(9, "子结构") {
         /* 子结构类型和子数据类型类似，只不过不需要移动行下标 */
-        override fun parseGridCell(gridParser: IGridReader, cell: Cell?, sheet: Sheet, bind: GridColumnInfo, rowIndex: Ref<Int>, father: IGridRowData): Any {
+        override fun parseGridCell(gridParser: IGridReader, cell: Cell?, sheet: Sheet, bind: GridColumnInfo, rowIndex: Ref<Int>, father: IMutableGridRowData): Any {
             val valueClass = bind.kMutableProperty.returnType.classifier as KClass<*>
-            require(valueClass.isSubclassOf(IGridRowData::class)) { "类:\"${father::class.simpleName}\"的属性:\"${bind.kMutableProperty.name}\"中, 子结构类型也必须实现\"${IGridRowData::class.simpleName}\"接口 " }
+            require(valueClass.isSubclassOf(IMutableGridRowData::class)) { "类:\"${father::class.simpleName}\"的属性:\"${bind.kMutableProperty.name}\"中, 子结构类型也必须实现\"${IMutableGridRowData::class.simpleName}\"接口 " }
             val gridSheetType = GridSheetType.SubStructure
             val subStructures = gridParser.readBySheet(sheet, valueClass, gridSheetType, rowIndex, father)
             return subStructures.values.first()
@@ -235,15 +235,15 @@ enum class GridValueType(
     },
     /** 特定表格。需要和 IGridSpecificSheet 接口一起使用，用于从特定的表格中获取表格数据。从 IGridSpecificSheet 接口中的 specificSheetName 变量获取特定表格的名称后，再进行下一步解析 */
     SpecificSheet(10, "特定表格") {
-        override fun parseGridCell(gridParser: IGridReader, cell: Cell?, sheet: Sheet, bind: GridColumnInfo, rowIndex: Ref<Int>, father: IGridRowData): Any {
+        override fun parseGridCell(gridParser: IGridReader, cell: Cell?, sheet: Sheet, bind: GridColumnInfo, rowIndex: Ref<Int>, father: IMutableGridRowData): Any {
             // 校验
-            require(father is IGridSpecificSheet<*>) { "类:\"${father::class.simpleName}\"必须实现\"${IGridSpecificSheet::class.simpleName}\"接口来指定数据表类型和数据表名称, 否则无法使用枚举项${SpecificSheet}来解析特定表格 " }
+            require(father is IMutableGridSpecificSheet<*>) { "类:\"${father::class.simpleName}\"必须实现\"${IMutableGridSpecificSheet::class.simpleName}\"接口来指定数据表类型和数据表名称, 否则无法使用枚举项${SpecificSheet}来解析特定表格 " }
             val (_, valueClass)  = bind.kMutableProperty.getDictionaryKeyValueTypes()
-            require(valueClass.isSubclassOf(IGridRowData::class)) { "类:\"${father::class.simpleName}\"的属性:\"${bind.kMutableProperty.name}\"中, 字典嵌套的值的类型也必须实现\"${IGridRowData::class.simpleName}\"接口 " }
+            require(valueClass.isSubclassOf(IMutableGridRowData::class)) { "类:\"${father::class.simpleName}\"的属性:\"${bind.kMutableProperty.name}\"中, 字典嵌套的值的类型也必须实现\"${IMutableGridRowData::class.simpleName}\"接口 " }
 
             // 校验完成后，需要将父级元素转换为 IGridTable ，并且提取出来 specificTableName;
-            val specificTableName = (father as IGridSpecificSheet<*>).specificSheetName
-            require(specificTableName.isNotBlank()) { "想要使用${SpecificSheet}模式来解析特定表格，\"${IGridSpecificSheet::class.simpleName}\"接口中的${IGridSpecificSheet<*>::specificSheetName.name}变量值必须非空(非null和非空白字符)" }
+            val specificTableName = (father as IMutableGridSpecificSheet<*>).specificSheetName
+            require(specificTableName.isNotBlank()) { "想要使用${SpecificSheet}模式来解析特定表格，\"${IMutableGridSpecificSheet::class.simpleName}\"接口中的${IMutableGridSpecificSheet<*>::specificSheetName.name}变量值必须非空(非null和非空白字符)" }
 
             // 拿到特定表格名称后,尝试获取表格
             val newSheet: Sheet = gridParser.sheetMap[specificTableName] ?: throw ExcelException("没有在传入的表格组件中找到名为:\"${specificTableName}\"的子表格(Sheet/Page/Tab)")
@@ -255,7 +255,7 @@ enum class GridValueType(
     },
     /** 使用自定义的解析适配器。使用该数据类型时，使用字符串标注适配器的名称，并且需要额外添加适配器到表格解析器当中。 */
     Custom(11, "自定义适配器") {
-        override fun parseGridCell(gridParser:IGridReader, cell: Cell?, sheet: Sheet, bind : GridColumnInfo, rowIndex: Ref<Int>, father: IGridRowData): Any {
+        override fun parseGridCell(gridParser:IGridReader, cell: Cell?, sheet: Sheet, bind : GridColumnInfo, rowIndex: Ref<Int>, father: IMutableGridRowData): Any {
             throw NotImplementedError("请不要单独使用${Custom::class.simpleName}的解析方法, 而是使用框架进行注册后，由框架调用自定义解析规则。")
         }
     };

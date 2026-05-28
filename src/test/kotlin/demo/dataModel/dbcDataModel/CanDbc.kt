@@ -4,11 +4,11 @@ import io.github.shilic.smartGrid.core.GridColumnBind
 import io.github.shilic.smartGrid.core.GridSheetBind
 import io.github.shilic.smartGrid.core.GridSheetType
 import io.github.shilic.smartGrid.core.GridValueType
-import io.github.shilic.smartGrid.core.IGridRowData
-import io.github.shilic.smartGrid.core.IGridSpecificSheet
+import io.github.shilic.smartGrid.core.IMutableGridRowData
+import io.github.shilic.smartGrid.core.IMutableGridSpecificSheet
 
 @GridSheetBind(sheetName = "DbcList", pattern = "DbcList", gridSheetType = GridSheetType.Dictionary)
-class CanDbc : IGridSpecificSheet<CanMessage>, IGridRowData {
+class CanDbc : IMutableGridSpecificSheet<CanMessage>, IMutableGridRowData {
     // IGridRowData 接口实现
     override val gridKey: String get() = dbcName
     override var gridFather: String = ""

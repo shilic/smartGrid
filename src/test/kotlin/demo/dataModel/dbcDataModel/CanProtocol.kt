@@ -3,7 +3,7 @@ package demo.dataModel.dbcDataModel
 import io.github.shilic.smartGrid.core.*
 
 @GridSheetBind(sheetName = "CanProtocol_Info", pattern = "CanProtocol_Info", gridSheetType = GridSheetType.Single)
-class CanProtocol : IGridRowData {
+class CanProtocol : IMutableGridRowData {
     // IGridRowData 接口实现
     override val gridKey: String get() = protocolName
     override var gridFather: String = ""

@@ -5,10 +5,10 @@ import io.github.shilic.smartGrid.core.GridColumnBind
 import io.github.shilic.smartGrid.core.GridSheetBind
 import io.github.shilic.smartGrid.core.GridSheetType
 import io.github.shilic.smartGrid.core.GridValueType
-import io.github.shilic.smartGrid.core.IGridRowData
+import io.github.shilic.smartGrid.core.IMutableGridRowData
 
 @GridSheetBind(sheetName = "Ecu Info",  pattern = "零部件信息|((Ecu|ecu|ECU)\\\\s*(Info|info|INFO))", gridSheetType = GridSheetType.Single)
-class Ecu : IGridRowData {
+class Ecu : IMutableGridRowData {
     // ======================= 1. 接口变量 =======================
     override val gridKey: String get() = ecuName
     override var gridFather: String = ""
@@ -47,7 +47,7 @@ class Ecu : IGridRowData {
 
 @GridSheetBind(gridSheetType = GridSheetType.SubStructure)
 @Deprecated("弃用")
-class EcuDiagInfo : IGridRowData {
+class EcuDiagInfo : IMutableGridRowData {
     @OptIn(ExperimentalStdlibApi::class)
     override val gridKey: String get() = diagRequestId.toHexString(HexFormat.UpperCase)
     override var gridFather: String = ""

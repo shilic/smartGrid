@@ -34,8 +34,8 @@ class GridReader(private val aWorkbook: Workbook?) : IGridReader {
      * @param objectType 指定表格数据的接收类型，需要在类型定义的字段中标记绑定哪一列
      * @param father 父级元素（可选）
      */
-    override fun <T : Any> read(objectType: KClass<T>, father: IGridRowData?): MutableMap<String, T> {
-        require(objectType.isSubclassOf(IGridRowData::class)) { "类型 ${objectType.qualifiedName} 必须实现 ${IGridRowData::class.simpleName} 接口, 才可以被框架解析" }
+    override fun <T : Any> read(objectType: KClass<T>, father: IMutableGridRowData?): MutableMap<String, T> {
+        require(objectType.isSubclassOf(IMutableGridRowData::class)) { "类型 ${objectType.qualifiedName} 必须实现 ${IMutableGridRowData::class.simpleName} 接口, 才可以被框架解析" }
         // 使用类型，解析注解得到表格信息，并尝试从工作表中获取对应表格
         val (sheet, sheetDataType) = checkSheet(objectType)
         // 如果没有该表格，则返回空集合
@@ -48,7 +48,7 @@ class GridReader(private val aWorkbook: Workbook?) : IGridReader {
     /**
      * 解析一个 sheet，返回包含 sheet 数据的字典
      */
-    override  fun <T : Any> readBySheet(sheet: Sheet, objectType: KClass<T>, gridSheetType: GridSheetType, rowIndex: Ref<Int>, father: IGridRowData?): MutableMap<String, T> {
+    override  fun <T : Any> readBySheet(sheet: Sheet, objectType: KClass<T>, gridSheetType: GridSheetType, rowIndex: Ref<Int>, father: IMutableGridRowData?): MutableMap<String, T> {
         // 获取表头，输出对应的字段和表头信息
         val (titleRow, columnBindInfos) = getTitle(sheet, objectType)
         // 将对象的字段和表格中的列绑定到一起，记录对应表头的列序号。这里需要注意，虽然说是同一个反射的结果，但是在不同的表格下，填充的列下标可能是不一样的。
@@ -70,14 +70,14 @@ class GridReader(private val aWorkbook: Workbook?) : IGridReader {
 
     /**  遍历所有行，添加数据 */
     private fun <T : Any> loopCells(sheet: Sheet, gridSheetType: GridSheetType, objectType: KClass<T>, rowIndex: Ref<Int>,
-        lastRowIndex: Int, columnBindInfos: List<GridColumnInfo>, resultMap: MutableMap<String, T>, father: IGridRowData? = null) {
+        lastRowIndex: Int, columnBindInfos: List<GridColumnInfo>, resultMap: MutableMap<String, T>, father: IMutableGridRowData? = null) {
         // ---------------- 外层循环，遍历所有行，添加数据 ------------------
         loopRow@
         while (rowIndex.value <= lastRowIndex) {
             // 通过反射实例化对象
             val instance : T = objectType.createInstance()
             // 对于子数据接口，设置父级键
-            if (instance is IGridChild) { instance.gridFather = father?.gridKey ?: "" }
+            if (instance is IMutableGridChild) { instance.gridFather = father?.gridKey ?: "" }
             // 如果行为空就跳过这一行
             val row: Row = sheet.getRow(rowIndex.value) ?: continue@loopRow
             // ----------------------------- 校验第一个单元格 ------------------------
@@ -116,7 +116,7 @@ class GridReader(private val aWorkbook: Workbook?) : IGridReader {
                         GridValueType.NotDefined -> continue@loopColumn
                         /* 获取绑定的列下标。(关键) 如果某一列没有, 说明表格中没有对应的表头，则忽略这个字段，跳过这个单元格。但是不跳过这一行数据。
                         *  这里存在的问题是，如果是 BindValueType.OtherPage 类型，因为没有标注正则表达式，所以也不会有列下标，所以无法找到单元格。所以这里单独对这一类型进行提前判断。 */
-                        GridValueType.OtherSheet, GridValueType.SpecificSheet ->  bind.valueType.parseGridCell(this, null, sheet, bind, rowIndex, instance as IGridRowData)
+                        GridValueType.OtherSheet, GridValueType.SpecificSheet ->  bind.valueType.parseGridCell(this, null, sheet, bind, rowIndex, instance as IMutableGridRowData)
                         else -> {
                             // 如果没有记录列下标，则跳过这一个单元格(不跳过一行)。
                             val columnIndex = bind.columnIndex ?: continue@loopColumn
@@ -132,8 +132,8 @@ class GridReader(private val aWorkbook: Workbook?) : IGridReader {
                                 GridValueType.Text, GridValueType.NumberType, GridValueType.HexNumber, GridValueType.ValueTable,
                                 GridValueType.Enumeration, GridValueType.SubSignal, GridValueType.BoolType, GridValueType.Strings,
                                 // GridValueType.SubStructure
-                                    -> bind.valueType.parseGridCell(this, cell, sheet, bind, rowIndex, instance as IGridRowData)
-                                GridValueType.Custom -> parseCustomValue(bind.customAdapterName, cell, sheet, bind, rowIndex, instance as IGridRowData)
+                                    -> bind.valueType.parseGridCell(this, cell, sheet, bind, rowIndex, instance as IMutableGridRowData)
+                                GridValueType.Custom -> parseCustomValue(bind.customAdapterName, cell, sheet, bind, rowIndex, instance as IMutableGridRowData)
                                 else -> cellValue
                             }
                         }
@@ -157,7 +157,7 @@ class GridReader(private val aWorkbook: Workbook?) : IGridReader {
 
     // ======================== 解析器实现 ========================
     /** 解析自定义的数据 */
-    private fun parseCustomValue(customAdapterName :String, cell: Cell?, sheet: Sheet,  bind : GridColumnInfo, rowIndex: Ref<Int>, father: IGridRowData): Any {
+    private fun parseCustomValue(customAdapterName :String, cell: Cell?, sheet: Sheet,  bind : GridColumnInfo, rowIndex: Ref<Int>, father: IMutableGridRowData): Any {
         // 尝试使用名称来获取自定义的解析器
         val custom = mCustomGridValueAdapters[customAdapterName]
             ?: throw IllegalArgumentException("没有找到名为:\"${customAdapterName}\"的自定义表格值适配器，请先使用 ${::registerGridValueAdapter.name} 方法注册")

@@ -4,14 +4,14 @@ import io.github.shilic.smartGrid.core.GridColumnBind
 import io.github.shilic.smartGrid.core.GridSheetBind
 import io.github.shilic.smartGrid.core.GridSheetType
 import io.github.shilic.smartGrid.core.GridValueType
-import io.github.shilic.smartGrid.core.IGridRowData
+import io.github.shilic.smartGrid.core.IMutableGridRowData
 
 /**
  * 诊断故障码 (DTC) 数据类
  * 使用密封接口实现更类型安全的多态行为
  */
 @GridSheetBind(sheetName = "DTC List", pattern = "\\s*(DTC|dtc|Dtc)\\s*(List|list|LIST)\\s*", gridSheetType = GridSheetType.Dictionary)
-class Dtc  : IGridRowData {
+class Dtc  : IMutableGridRowData {
     // ======================= 1. 接口变量 =======================
     override val gridKey: String get() = dtcHexNumber.toHexString()
     override var gridFather: String = ""

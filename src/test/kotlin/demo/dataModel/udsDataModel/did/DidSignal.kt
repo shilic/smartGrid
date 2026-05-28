@@ -4,7 +4,7 @@ import io.github.shilic.smartGrid.core.GridColumnBind
 import io.github.shilic.smartGrid.core.GridSheetBind
 import io.github.shilic.smartGrid.core.GridSheetType
 import io.github.shilic.smartGrid.core.GridValueType
-import io.github.shilic.smartGrid.core.IGridRowData
+import io.github.shilic.smartGrid.core.IMutableGridRowData
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import kotlin.concurrent.read
 import kotlin.concurrent.write
@@ -14,7 +14,7 @@ import kotlin.concurrent.write
  * 现在所有类型都使用枚举，代码更简洁
  */
 @GridSheetBind(gridSheetType = GridSheetType.SubSignal)
-class DidSignal: IGridRowData {
+class DidSignal: IMutableGridRowData {
     // 必选参数
     @GridColumnBind(headerText = "子数据名称", pattern = "子数据名称", valueType = GridValueType.Text, uiIgnore = true, keyword = true)
     var signalName: String = ""

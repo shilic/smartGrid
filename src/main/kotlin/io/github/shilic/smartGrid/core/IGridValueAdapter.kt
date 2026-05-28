@@ -10,5 +10,5 @@ import org.apache.poi.ss.usermodel.Sheet
 interface IGridValueAdapter {
     /** 适配器的名称 */
     val adapterName: String
-    fun parseGridCell(gridParser:IGridReader, cell: Cell?, sheet: Sheet, bind : GridColumnInfo, rowIndex: Ref<Int>, father: IGridRowData) : Any
+    fun parseGridCell(gridParser:IGridReader, cell: Cell?, sheet: Sheet, bind : GridColumnInfo, rowIndex: Ref<Int>, father: IMutableGridRowData) : Any
 }

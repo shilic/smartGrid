@@ -4,14 +4,14 @@ import io.github.shilic.smartGrid.core.GridColumnBind
 import io.github.shilic.smartGrid.core.GridSheetBind
 import io.github.shilic.smartGrid.core.GridSheetType
 import io.github.shilic.smartGrid.core.GridValueType
-import io.github.shilic.smartGrid.core.IGridRowData
+import io.github.shilic.smartGrid.core.IMutableGridRowData
 
 /**
  * 普通 DID
  * 通过 @SheetBind 注解与表格解析器集成
  */
 @GridSheetBind(sheetName = "Did", pattern = "\\s*(Did|DID|did)\\s*", gridSheetType = GridSheetType.Dictionary)
-open class Did: IGridRowData {
+open class Did: IMutableGridRowData {
     // 必选参数
     @GridColumnBind(headerText = "DID号", pattern = "DID号", valueType = GridValueType.HexNumber, keyword = true)
     var didNumber: UShort = 0u

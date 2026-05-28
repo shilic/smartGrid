@@ -14,8 +14,8 @@ plugins {
 }
 // 项目组 ID。 组的名称必须命名为 io.github.你的github名称
 group = "io.github.shilic"
-// 项目版本
-version = "1.0.3"
+// 项目版本 1.0-SNAPSHOT
+version = "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
