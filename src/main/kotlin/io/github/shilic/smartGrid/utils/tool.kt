@@ -17,20 +17,28 @@ import kotlin.reflect.jvm.javaField
  * */
 private val mBindCache : MutableMap<KClass<*>, List<GridColumnInfo>> = mutableMapOf()
 
-/** 从缓存中获取反射信息，或者重新使用反射获取 */
+/** 从缓存中获取反射信息，或者重新使用反射获取。
+ *
+ * 默认 筛选注解的 pattern(不为空) 和 valueType ；
+ * */
 fun KClass<*>.getOrCacheBinds() : List<GridColumnInfo> {
     return mBindCache.getOrPut(this) { this.getGridInfos() }
 }
 /**
- * 使用反射, 从类型上的所有属性获取绑定的 GridInfo 信息。你可能需要缓存反射的结果。
+ * 使用反射, 从类型上的所有属性获取绑定的 GridInfo 信息。
+ *
+ * 默认 筛选注解的 pattern(不为空) 和 valueType ；
+ *
+ * 你可能需要缓存反射的结果。
  *
  * @param filter 是否使用默认过滤条件（pattern 非空 或 valueType = OtherPage）; 当你要获取所有注解时，使 defaultFilter 为 false ;
  */
 fun KClass<*>.getGridInfos(filter: Boolean = true): List<GridColumnInfo> =
+    // 获取按顺序定义的所有字段
     getOrderProperties()
         // 步骤1: 创建GridBind注解(筛选注解不为空)和属性的键值对集合
         .mapNotNull { property -> property.findAnnotation<GridColumnBind>()?.let { property to it } }
-        // 步骤2: 使用kotlin的函数筛选注解的 pattern 和 valueType 。(filter 为 false 时，立刻放弃筛选。)
+        // 步骤2: 使用kotlin的函数筛选注解的 pattern(不为空) 和 valueType 。(filter 为 false 时，立刻放弃筛选(全过滤)。)
         .filter { (_, bind) -> !filter || bind.pattern.isNotBlank() || bind.valueType == GridValueType.OtherSheet || bind.valueType == GridValueType.SpecificSheet  }
         // 步骤3: 筛选可变属性
         .filter { (property, _) ->

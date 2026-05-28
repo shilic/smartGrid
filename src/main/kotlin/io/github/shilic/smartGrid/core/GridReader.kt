@@ -2,15 +2,7 @@ package io.github.shilic.smartGrid.core
 
 import org.apache.poi.ss.usermodel.*
 import io.github.shilic.smartGrid.exception.ExcelException
-import io.github.shilic.smartGrid.utils.exCell
-import io.github.shilic.smartGrid.utils.forEachCell
-import io.github.shilic.smartGrid.utils.getLastColumnIndex
-import io.github.shilic.smartGrid.utils.getLastRowIndex
-import io.github.shilic.smartGrid.utils.getOrCacheBinds
-import io.github.shilic.smartGrid.utils.getSheetMap
-import io.github.shilic.smartGrid.utils.isNotBlank
-import io.github.shilic.smartGrid.utils.isStrikeThrough
-import io.github.shilic.smartGrid.utils.stringValue
+import io.github.shilic.smartGrid.utils.*
 import kotlin.reflect.KClass
 import kotlin.reflect.full.*
 
@@ -42,7 +34,7 @@ class GridReader(private val aWorkbook: Workbook?) : IGridReader {
      * @param objectType 指定表格数据的接收类型，需要在类型定义的字段中标记绑定哪一列
      * @param father 父级元素（可选）
      */
-    override fun <T : Any> read(objectType: KClass<T>, father: IGridRowData?): Map<String, T> {
+    override fun <T : Any> read(objectType: KClass<T>, father: IGridRowData?): MutableMap<String, T> {
         require(objectType.isSubclassOf(IGridRowData::class)) { "类型 ${objectType.qualifiedName} 必须实现 ${IGridRowData::class.simpleName} 接口, 才可以被框架解析" }
         // 使用类型，解析注解得到表格信息，并尝试从工作表中获取对应表格
         val (sheet, sheetDataType) = checkSheet(objectType)
@@ -56,7 +48,7 @@ class GridReader(private val aWorkbook: Workbook?) : IGridReader {
     /**
      * 解析一个 sheet，返回包含 sheet 数据的字典
      */
-    override  fun <T : Any> readBySheet(sheet: Sheet, objectType: KClass<T>, gridSheetType: GridSheetType, rowIndex: Ref<Int>, father: IGridRowData?): Map<String, T> {
+    override  fun <T : Any> readBySheet(sheet: Sheet, objectType: KClass<T>, gridSheetType: GridSheetType, rowIndex: Ref<Int>, father: IGridRowData?): MutableMap<String, T> {
         // 获取表头，输出对应的字段和表头信息
         val (titleRow, columnBindInfos) = getTitle(sheet, objectType)
         // 将对象的字段和表格中的列绑定到一起，记录对应表头的列序号。这里需要注意，虽然说是同一个反射的结果，但是在不同的表格下，填充的列下标可能是不一样的。
@@ -79,7 +71,7 @@ class GridReader(private val aWorkbook: Workbook?) : IGridReader {
     /**  遍历所有行，添加数据 */
     private fun <T : Any> loopCells(sheet: Sheet, gridSheetType: GridSheetType, objectType: KClass<T>, rowIndex: Ref<Int>,
         lastRowIndex: Int, columnBindInfos: List<GridColumnInfo>, resultMap: MutableMap<String, T>, father: IGridRowData? = null) {
-        // ----------------------------- 外层循环，遍历所有行，添加数据 -------------------------------------
+        // ---------------- 外层循环，遍历所有行，添加数据 ------------------
         loopRow@
         while (rowIndex.value <= lastRowIndex) {
             // 通过反射实例化对象
@@ -113,7 +105,7 @@ class GridReader(private val aWorkbook: Workbook?) : IGridReader {
                 rowIndex.value += 1
                 continue@loopRow
             }
-            // ---------------------------- 内层循环。遍历绑定信息（遍历一行中的所有列） ---------------------------
+            // --------- 内层循环。遍历绑定信息（遍历一行中的所有列） -----------
             loopColumn@
             for (bind in columnBindInfos) {
                 //println("bind.valueType = ${bind.valueType}")
@@ -191,7 +183,10 @@ class GridReader(private val aWorkbook: Workbook?) : IGridReader {
         return sheet to sheetAttr.gridSheetType
     }
 
-    /**  解析表头。返回表头所在的行，以及所有字段的绑定信息。*/
+    /**  解析表头。返回表头所在的行，以及所有字段的绑定信息。
+     *
+     * 默认 筛选注解的 pattern(不为空) 和 valueType ；
+     * */
     private fun <T : Any> getTitle(sheet: Sheet, objectType: KClass<T>): Pair<Row, List<GridColumnInfo> > {
         val columnBindInfos = objectType.getOrCacheBinds()
 

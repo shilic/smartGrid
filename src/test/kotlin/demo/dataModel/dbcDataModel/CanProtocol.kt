@@ -1,10 +1,6 @@
 package demo.dataModel.dbcDataModel
 
-import io.github.shilic.smartGrid.core.GridColumnBind
-import io.github.shilic.smartGrid.core.GridSheetBind
-import io.github.shilic.smartGrid.core.GridSheetType
-import io.github.shilic.smartGrid.core.GridValueType
-import io.github.shilic.smartGrid.core.IGridRowData
+import io.github.shilic.smartGrid.core.*
 
 @GridSheetBind(sheetName = "CanProtocol_Info", pattern = "CanProtocol_Info", gridSheetType = GridSheetType.Single)
 class CanProtocol : IGridRowData {
