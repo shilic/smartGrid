@@ -237,13 +237,13 @@ enum class GridValueType(
     SpecificSheet(10, "特定表格") {
         override fun parseGridCell(gridParser: IGridReader, cell: Cell?, sheet: Sheet, bind: GridColumnInfo, rowIndex: Ref<Int>, father: IMutableGridRowData): Any {
             // 校验
-            require(father is IMutableGridSpecificSheet<*>) { "类:\"${father::class.simpleName}\"必须实现\"${IMutableGridSpecificSheet::class.simpleName}\"接口来指定数据表类型和数据表名称, 否则无法使用枚举项${SpecificSheet}来解析特定表格 " }
+            require(father is IMutableGridSpecificSheet) { "类:\"${father::class.simpleName}\"必须实现\"${IMutableGridSpecificSheet::class.simpleName}\"接口来指定数据表类型和数据表名称, 否则无法使用枚举项${SpecificSheet}来解析特定表格 " }
             val (_, valueClass)  = bind.kMutableProperty.getDictionaryKeyValueTypes()
             require(valueClass.isSubclassOf(IMutableGridRowData::class)) { "类:\"${father::class.simpleName}\"的属性:\"${bind.kMutableProperty.name}\"中, 字典嵌套的值的类型也必须实现\"${IMutableGridRowData::class.simpleName}\"接口 " }
 
             // 校验完成后，需要将父级元素转换为 IGridTable ，并且提取出来 specificTableName;
-            val specificTableName = (father as IMutableGridSpecificSheet<*>).specificSheetName
-            require(specificTableName.isNotBlank()) { "想要使用${SpecificSheet}模式来解析特定表格，\"${IMutableGridSpecificSheet::class.simpleName}\"接口中的${IMutableGridSpecificSheet<*>::specificSheetName.name}变量值必须非空(非null和非空白字符)" }
+            val specificTableName = (father as IMutableGridSpecificSheet).specificSheetName
+            require(specificTableName.isNotBlank()) { "想要使用${SpecificSheet}模式来解析特定表格，\"${IMutableGridSpecificSheet::class.simpleName}\"接口中的${IMutableGridSpecificSheet::specificSheetName.name}变量值必须非空(非null和非空白字符)" }
 
             // 拿到特定表格名称后,尝试获取表格
             val newSheet: Sheet = gridParser.sheetMap[specificTableName] ?: throw ExcelException("没有在传入的表格组件中找到名为:\"${specificTableName}\"的子表格(Sheet/Page/Tab)")

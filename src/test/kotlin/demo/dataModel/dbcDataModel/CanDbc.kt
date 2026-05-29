@@ -8,7 +8,7 @@ import io.github.shilic.smartGrid.core.IMutableGridRowData
 import io.github.shilic.smartGrid.core.IMutableGridSpecificSheet
 
 @GridSheetBind(sheetName = "DbcList", pattern = "DbcList", gridSheetType = GridSheetType.Dictionary)
-class CanDbc : IMutableGridSpecificSheet<CanMessage>, IMutableGridRowData {
+class CanDbc : IMutableGridSpecificSheet, IMutableGridRowData {
     // IGridRowData 接口实现
     override val gridKey: String get() = dbcName
     override var gridFather: String = ""
@@ -21,7 +21,6 @@ class CanDbc : IMutableGridSpecificSheet<CanMessage>, IMutableGridRowData {
 
     @GridColumnBind(headerText = "DBC页面名称", pattern = "DBC页面名称", valueType = GridValueType.Text)
     override var specificSheetName: String = ""
-    override val gridDataMap get() = canMsgMap
 
     @GridColumnBind(headerText = "CAN1", valueType = GridValueType.SpecificSheet)
     var canMsgMap: MutableMap<String, CanMessage> = mutableMapOf()
