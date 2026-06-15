@@ -26,7 +26,7 @@ tasks.register<Jar>("sourcesJar") {
     from(sourceSets.main.get().allSource)
 }
 
-// Javadoc 包 (纯 Kotlin 项目内容为空，如需 Kotlin 文档请另加 Dokka 插件)
+// Javadoc 包 (可查看注释)
 tasks.register<Jar>("javadocJar") {
     archiveClassifier.set("javadoc")
     from(tasks.javadoc.get().outputs)
@@ -90,7 +90,9 @@ publishing {
             // kotlin("jvm") 插件内部会应用 java 插件，所以软件组件名统一叫 "java"，没有 "kotlin" 这个组件。
             // 这不是"不可变"，而是 JVM 类库的标准写法——Java 和 Kotlin 都是同一个 `components["java"]。
             from(components["java"])
+            // 打包源码包
             artifact(tasks["sourcesJar"])
+            // 打包注释包
             artifact(tasks["javadocJar"])
             // 可以在这里自定义 POM 内容
             pom {
