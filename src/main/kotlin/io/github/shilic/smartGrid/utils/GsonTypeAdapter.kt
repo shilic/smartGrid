@@ -1,4 +1,4 @@
-package demo.utils
+package io.github.shilic.smartGrid.utils
 
 import com.google.gson.*
 import com.google.gson.reflect.TypeToken
@@ -6,6 +6,7 @@ import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
 import com.google.gson.stream.JsonWriter
 import java.lang.reflect.ParameterizedType
+import java.lang.reflect.Type
 
 /**
  * 简洁的十六进制格式化工具，所有整数类型都转换为带0x前缀的十六进制字符串
@@ -68,7 +69,7 @@ private class NumberHexAdapter : JsonSerializer<Number>, JsonDeserializer<Number
 
     override fun serialize(
         src: Number?,
-        typeOfSrc: java.lang.reflect.Type?,
+        typeOfSrc: Type?,
         context: JsonSerializationContext
     ): JsonElement {
         return when (src) {
@@ -83,7 +84,7 @@ private class NumberHexAdapter : JsonSerializer<Number>, JsonDeserializer<Number
 
     override fun deserialize(
         json: JsonElement?,
-        typeOfT: java.lang.reflect.Type?,
+        typeOfT: Type?,
         context: JsonDeserializationContext
     ): Number? {
         if (json == null || json.isJsonNull) return null
@@ -111,11 +112,11 @@ private class NumberHexAdapter : JsonSerializer<Number>, JsonDeserializer<Number
  * 无符号整数类型适配器
  */
 private class UIntAdapter : JsonSerializer<UInt>, JsonDeserializer<UInt> {
-    override fun serialize(src: UInt?, typeOfSrc: java.lang.reflect.Type?, context: JsonSerializationContext): JsonElement {
+    override fun serialize(src: UInt?, typeOfSrc: Type?, context: JsonSerializationContext): JsonElement {
         return src?.let { JsonPrimitive("0x${it.toString(16).uppercase()}") } ?: JsonNull.INSTANCE
     }
 
-    override fun deserialize(json: JsonElement?, typeOfT: java.lang.reflect.Type?, context: JsonDeserializationContext): UInt? {
+    override fun deserialize(json: JsonElement?, typeOfT: Type?, context: JsonDeserializationContext): UInt? {
         if (json == null || json.isJsonNull) return null
         val str = json.asString.trim()
         val hexStr = when {
@@ -127,11 +128,11 @@ private class UIntAdapter : JsonSerializer<UInt>, JsonDeserializer<UInt> {
     }
 }
 private class ULongAdapter : JsonSerializer<ULong>, JsonDeserializer<ULong> {
-    override fun serialize(src: ULong?, typeOfSrc: java.lang.reflect.Type?, context: JsonSerializationContext): JsonElement {
+    override fun serialize(src: ULong?, typeOfSrc: Type?, context: JsonSerializationContext): JsonElement {
         return src?.let { JsonPrimitive("0x${it.toString(16).uppercase()}") } ?: JsonNull.INSTANCE
     }
 
-    override fun deserialize(json: JsonElement?, typeOfT: java.lang.reflect.Type?, context: JsonDeserializationContext): ULong? {
+    override fun deserialize(json: JsonElement?, typeOfT: Type?, context: JsonDeserializationContext): ULong? {
         if (json == null || json.isJsonNull) return null
         val str = json.asString.trim()
         val hexStr = when {
@@ -143,11 +144,11 @@ private class ULongAdapter : JsonSerializer<ULong>, JsonDeserializer<ULong> {
     }
 }
 private class UShortAdapter : JsonSerializer<UShort>, JsonDeserializer<UShort> {
-    override fun serialize(src: UShort?, typeOfSrc: java.lang.reflect.Type?, context: JsonSerializationContext): JsonElement {
+    override fun serialize(src: UShort?, typeOfSrc: Type?, context: JsonSerializationContext): JsonElement {
         return src?.let { JsonPrimitive("0x${it.toString(16).uppercase()}") } ?: JsonNull.INSTANCE
     }
 
-    override fun deserialize(json: JsonElement?, typeOfT: java.lang.reflect.Type?, context: JsonDeserializationContext): UShort? {
+    override fun deserialize(json: JsonElement?, typeOfT: Type?, context: JsonDeserializationContext): UShort? {
         if (json == null || json.isJsonNull) return null
         val str = json.asString.trim()
         val hexStr = when {
@@ -159,11 +160,11 @@ private class UShortAdapter : JsonSerializer<UShort>, JsonDeserializer<UShort> {
     }
 }
 private class UByteAdapter : JsonSerializer<UByte>, JsonDeserializer<UByte> {
-    override fun serialize(src: UByte?, typeOfSrc: java.lang.reflect.Type?, context: JsonSerializationContext): JsonElement {
+    override fun serialize(src: UByte?, typeOfSrc: Type?, context: JsonSerializationContext): JsonElement {
         return src?.let { JsonPrimitive("0x${it.toString(16).uppercase()}") } ?: JsonNull.INSTANCE
     }
 
-    override fun deserialize(json: JsonElement?, typeOfT: java.lang.reflect.Type?, context: JsonDeserializationContext): UByte? {
+    override fun deserialize(json: JsonElement?, typeOfT: Type?, context: JsonDeserializationContext): UByte? {
         if (json == null || json.isJsonNull) return null
         val str = json.asString.trim()
         val hexStr = when {

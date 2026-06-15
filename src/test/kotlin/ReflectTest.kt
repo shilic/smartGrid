@@ -1,4 +1,4 @@
-import demo.utils.toGsonString
+import io.github.shilic.smartGrid.utils.toGsonString
 import io.github.shilic.smartGrid.utils.memberMutableProperties
 import kotlin.reflect.KMutableProperty1
 import kotlin.test.Test

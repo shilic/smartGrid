@@ -4,7 +4,7 @@ import io.github.shilic.smartGrid.core.GridReader
 import io.github.shilic.smartGrid.core.poiWorkbook
 import demo.dataModel.dbcDataModel.CanProtocol
 import demo.dataModel.udsDataModel.Ecu
-import demo.utils.toGsonString
+import io.github.shilic.smartGrid.utils.toGsonString
 import kotlin.test.Test
 
 fun main() {
