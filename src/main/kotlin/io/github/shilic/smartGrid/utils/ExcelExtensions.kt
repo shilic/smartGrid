@@ -2,9 +2,10 @@ package io.github.shilic.smartGrid.utils
 
 import org.apache.poi.ss.usermodel.*
 import io.github.shilic.smartGrid.exception.ExcelException
-import java.io.FileInputStream
+import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
+import java.io.InputStream
 
 /**
  * Workbook 的相关扩展函数;
@@ -13,16 +14,24 @@ import java.io.IOException
 private const val LOG_TAG = "ExcelTools"
 val SUPPORTED_EXCEL_EXTENSIONS = listOf("xls", "xlsx")
 
-/**
- * 获取一个工作簿;
- * 使用 Kotlin 的异常处理和资源管理;
- */
-fun createWorkbook (filePath: String): Workbook {
-    val fileExtension = filePath.fileExtension.lowercase()
-    require(SUPPORTED_EXCEL_EXTENSIONS.contains(fileExtension)){"$LOG_TAG: 不支持的文件格式: $fileExtension, 必须是\"xls\", \"xlsx\"文件"}
+/** 提供获取工作簿的默认实现，通过文件路径, 使用POI组件获取;*/
+fun String.workbook(): Workbook {
+    require(this.isNotBlank()) { "$LOG_TAG: 文件路径为空，无法识别文件。" }
+    return File(this).workbook()
+}
+/** 提供获取工作簿的默认实现，通过文件, 使用POI组件获取; */
+fun File.workbook(): Workbook {
+    require(this.exists()) { "$LOG_TAG: 文件不存在，没找到指定文件: $this" }
+    require(this.isFile) { "$LOG_TAG: 确保\"${this.name}\"是文件，而不是目录" }
+    require(SUPPORTED_EXCEL_EXTENSIONS.contains(extension)){"$LOG_TAG: 不支持的文件格式: $extension, 必须是\"xls\", \"xlsx\"文件"}
+    return this::inputStream.workbook()
+}
+/** 提供获取工作簿的默认实现，通过文件流提供者, 使用POI组件获取; */
+fun (() -> InputStream).workbook(): Workbook = this().workbook()
+/** 提供获取工作簿的默认实现，通过文件流, 使用POI组件获取; */
+fun InputStream.workbook(): Workbook {
     return try {
-        // 使用 Kotlin 的 use 函数自动管理资源
-        FileInputStream(filePath).use { fileStream -> WorkbookFactory.create(fileStream) }
+        this.use { WorkbookFactory.create(it) }
     } catch (ex: FileNotFoundException) {
         throw ExcelException("$LOG_TAG: FileNotFoundException - 文件不存在: ${ex.message}")
     } catch (ex: IOException) {
@@ -31,7 +40,6 @@ fun createWorkbook (filePath: String): Workbook {
         throw ExcelException("$LOG_TAG: 未知错误: ${ex.message}")
     }
 }
-
 /**
  * 获取工作表名称到工作表的映射
  * 使用 Kotlin 的 associate 函数创建映射
