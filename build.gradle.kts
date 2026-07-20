@@ -14,7 +14,7 @@ group = "io.github.shilic"
 /* 版本号  !!! 严禁 -SNAPSHOT */
 version = "1.0.3"
 /** 提取个人的链接，方便统一修改 */
-val myGit: String = "github.com/shilic/smart-grid"
+val myGit: String = "github.com/shilic/$artifactId"
 /** 复用我的POM */
 val myPom: MavenPom.() -> Unit = {
     name = artifactId
