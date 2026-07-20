@@ -12,7 +12,7 @@ val artifactId: String = rootProject.name
 /* 组织机构的名称必须是 io.github.<你的github名称>，除非你有你自己的域名; maven中心会校验你是否拥有这个域名，否则一律挂到 github 下 */
 group = "io.github.shilic"
 /* 版本号  !!! 严禁 -SNAPSHOT */
-version = "1.0.2"
+version = "1.0.3"
 /** 提取个人的链接，方便统一修改 */
 val myGit: String = "github.com/shilic/smart-grid"
 /** 复用我的POM */
