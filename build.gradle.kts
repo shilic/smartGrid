@@ -7,18 +7,21 @@ plugins {
     id("com.vanniktech.maven.publish") version "0.36.0"
 }
 /* ======================= 填写个人信息 ============================= */
+val githubUser = "shilic"
+/* 版本号  !!! 严禁 -SNAPSHOT */
+version = "1.0.4"
+val mDescription = "更聪明的表格，用于把有任意复杂嵌套关系的excel表格转换为kotlin对象。"
+
+/* 组织机构的名称必须是 io.github.<你的github名称>，除非你有你自己的域名; maven中心会校验你是否拥有这个域名，否则一律挂到 github 下 */
+group = "io.github.$githubUser"
 /** 从 settings.gradle.kts 文件取值过来 */
 val artifactId: String = rootProject.name
-/* 组织机构的名称必须是 io.github.<你的github名称>，除非你有你自己的域名; maven中心会校验你是否拥有这个域名，否则一律挂到 github 下 */
-group = "io.github.shilic"
-/* 版本号  !!! 严禁 -SNAPSHOT */
-version = "1.0.3"
 /** 提取个人的链接，方便统一修改 */
-val myGit: String = "github.com/shilic/$artifactId"
+val myGit: String = "github.com/$githubUser/$artifactId"
 /** 复用我的POM */
 val myPom: MavenPom.() -> Unit = {
     name = artifactId
-    description = "更聪明的网络字节转换器"
+    description = mDescription
     url = "https://$myGit"
     licenses {
         license {
@@ -61,7 +64,7 @@ afterEvaluate {
         repositories {
             maven {
                 name = "GitHubPackages"
-                url = uri("https://maven.pkg.github.com/shilic/${artifactId}")
+                url = uri("https://maven.pkg.github.com/$githubUser/${artifactId}")
                 credentials {
                     username = globalProps.getProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR") ?: ""
                     password = globalProps.getProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN") ?: ""
